@@ -1,21 +1,48 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareButton from '../../components/ShareButton.astro';
+import WorkCard from '../../components/WorkCard.astro';
 import { WORKS, type Work } from '../../data/fixtures';
+import { getRelatedWorks } from '../../lib/content/relatedWorks.ts';
 
 export function getStaticPaths() {
   const poems = WORKS.filter(w => w.contentType === 'poem');
-  return poems.map(poem => ({
-    params: { slug: poem.slug },
-    props: { poem }
-  }));
+  const paths: Array<{ params: { slug: string }; props: { poem: Work; isHistorical?: boolean; canonicalSlug?: string } }> = [];
+
+  poems.forEach(poem => {
+    // Canonical path
+    paths.push({
+      params: { slug: poem.slug },
+      props: { poem }
+    });
+
+    // Historical redirect paths if slug was revised
+    if (poem.previousSlugs) {
+      poem.previousSlugs.forEach(prev => {
+        paths.push({
+          params: { slug: prev },
+          props: { poem, isHistorical: true, canonicalSlug: poem.slug }
+        });
+      });
+    }
+  });
+
+  return paths;
 }
 
 interface Props {
   poem: Work;
+  isHistorical?: boolean;
+  canonicalSlug?: string;
 }
 
-const { poem } = Astro.props;
+const { poem, isHistorical, canonicalSlug } = Astro.props;
+
+// If accessed via an old historical slug, permanently redirect to canonical URL
+if (isHistorical && canonicalSlug) {
+  return Astro.redirect(`/poetry/${canonicalSlug}`, 301);
+}
+
 const isHi = poem.language === 'hi' && poem.script === 'Deva';
 
 // Break body into distinct stanzas (delimited by double newlines)
@@ -25,6 +52,13 @@ const stanzas = poem.body ? poem.body.split(/\n\s*\n/) : [];
 const companionWork = poem.translatedEditionSlug 
   ? WORKS.find(w => w.slug === poem.translatedEditionSlug)
   : null;
+
+const companionPath = companionWork
+  ? (companionWork.contentType === 'poem' ? `/poetry/${companionWork.slug}` : `/prose/${companionWork.slug}`)
+  : undefined;
+
+// Contextual Related Works
+const relatedWorks = getRelatedWorks(poem, 3);
 ---
 
 <BaseLayout 
@@ -33,6 +67,12 @@ const companionWork = poem.translatedEditionSlug
   image={poem.coverImage}
   lang={poem.language}
   type="article"
+  alternateLang={companionWork?.language}
+  alternateURL={companionPath}
+  publishedTime={poem.publishedAt}
+  modifiedTime={poem.updatedAt}
+  author={poem.creator}
+  tags={poem.tags}
 >
   <div class="container poem-page-container">
     <!-- Breadcrumb & Navigation -->
@@ -146,6 +186,21 @@ const companionWork = poem.translatedEditionSlug
         </div>
       </div>
     </section>
+
+    <!-- Related Works Section (Bilingual Recommendation Engine) -->
+    {relatedWorks.length > 0 && (
+      <section class="related-works-section" aria-label="Related works">
+        <div class="related-heading-row">
+          <h2 class="related-title">Related Works • संबंधित रचनाएँ</h2>
+          <span class="related-sub">Contextually curated from the anthology</span>
+        </div>
+        <div class="related-grid">
+          {relatedWorks.map((work) => (
+            <WorkCard work={work} />
+          ))}
+        </div>
+      </section>
+    )}
 
     <!-- Return to Anthology -->
     <div class="poem-bottom-nav">
@@ -370,6 +425,40 @@ const companionWork = poem.translatedEditionSlug
     flex-wrap: wrap;
     gap: var(--space-4);
     color: var(--text-muted);
+  }
+
+  /* Related Works */
+  .related-works-section {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .related-heading-row {
+    margin-bottom: var(--space-6);
+  }
+
+  .related-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .related-sub {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-6);
   }
 
   .poem-bottom-nav {

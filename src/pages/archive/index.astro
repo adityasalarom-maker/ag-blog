@@ -86,6 +86,13 @@ import { WORKS } from '../../data/fixtures';
       ))}
     </div>
 
+    <!-- Incremental Pagination Controls -->
+    <div class="load-more-row" id="load-more-container" style="display: none;">
+      <button type="button" id="load-more-btn" class="btn btn-outline load-more-btn">
+        Load More Works • और रचनाएँ देखें ↓
+      </button>
+    </div>
+
     <!-- Empty State -->
     <div id="no-results" class="no-results-state" style="display: none;">
       <span class="no-results-icon">✦</span>
@@ -252,6 +259,19 @@ import { WORKS } from '../../data/fixtures';
     margin-inline: auto;
     margin-bottom: var(--space-6);
   }
+
+  .load-more-row {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-8);
+  }
+
+  .load-more-btn {
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--text-sm);
+    letter-spacing: 0.05em;
+  }
 </style>
 
 <script>
@@ -261,22 +281,65 @@ import { WORKS } from '../../data/fixtures';
     const typeSelect = document.getElementById('filter-type') as HTMLSelectElement | null;
     const langSelect = document.getElementById('filter-lang') as HTMLSelectElement | null;
     const resultsCount = document.getElementById('results-count');
-    const items = document.querySelectorAll<HTMLElement>('.archive-item');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('.archive-item'));
     const noResults = document.getElementById('no-results');
     const resetBtn = document.getElementById('reset-filters-btn');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const loadMoreBtn = document.getElementById('load-more-btn');
 
-    function filterWorks() {
+    const PAGE_SIZE = 12;
+    let currentPage = 1;
+
+    // 1. Initialize from URL Search Params if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQ = urlParams.get('q');
+    const initialType = urlParams.get('type');
+    const initialLang = urlParams.get('lang');
+
+    if (initialQ && searchInput) {
+      searchInput.value = initialQ;
+    }
+    if (initialType && typeSelect) {
+      const validTypes = ['all', 'poem', 'story', 'essay', 'thought', 'quote', 'artwork'];
+      if (validTypes.includes(initialType)) {
+        typeSelect.value = initialType;
+      }
+    }
+    if (initialLang && langSelect) {
+      const validLangs = ['all', 'hi-Deva', 'hi-Latn', 'en-Latn'];
+      if (validLangs.includes(initialLang)) {
+        langSelect.value = initialLang;
+      }
+    }
+
+    function syncURL(query: string, type: string, lang: string) {
+      const params = new URLSearchParams();
+      if (query) params.set('q', query);
+      if (type !== 'all') params.set('type', type);
+      if (lang !== 'all') params.set('lang', lang);
+
+      const queryString = params.toString();
+      const newURL = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+      window.history.replaceState({}, '', newURL);
+    }
+
+    function filterWorks(resetPagination = true) {
+      if (resetPagination) {
+        currentPage = 1;
+      }
+
       const query = (searchInput?.value || '').trim().toLowerCase();
       const selectedType = typeSelect?.value || 'all';
       const selectedLang = langSelect?.value || 'all';
+
+      syncURL(query, selectedType, selectedLang);
 
       if (clearBtn) {
         clearBtn.style.display = query ? 'block' : 'none';
       }
 
-      let visibleCount = 0;
-
-      items.forEach(item => {
+      // Filter matching items
+      const matchingItems = items.filter(item => {
         const title = item.getAttribute('data-title') || '';
         const excerpt = item.getAttribute('data-excerpt') || '';
         const tags = item.getAttribute('data-tags') || '';
@@ -293,38 +356,65 @@ import { WORKS } from '../../data/fixtures';
         const matchesType = selectedType === 'all' || type === selectedType;
         const matchesLang = selectedLang === 'all' || langScript === selectedLang;
 
-        if (matchesQuery && matchesType && matchesLang) {
+        return matchesQuery && matchesType && matchesLang;
+      });
+
+      // Pagination calculation
+      const maxVisible = currentPage * PAGE_SIZE;
+      const displayedItems = matchingItems.slice(0, maxVisible);
+
+      // Apply visibility to DOM
+      items.forEach(item => {
+        if (displayedItems.includes(item)) {
           item.style.display = 'block';
-          visibleCount++;
         } else {
           item.style.display = 'none';
         }
       });
 
+      // Update counters
       if (resultsCount) {
-        resultsCount.textContent = `Showing ${visibleCount} of ${items.length} works`;
+        if (matchingItems.length > maxVisible) {
+          resultsCount.textContent = `Showing ${displayedItems.length} of ${matchingItems.length} matching works (${items.length} in archive)`;
+        } else {
+          resultsCount.textContent = `Showing ${matchingItems.length} of ${items.length} works`;
+        }
       }
 
+      // Show/hide load more button
+      if (loadMoreContainer) {
+        loadMoreContainer.style.display = matchingItems.length > maxVisible ? 'flex' : 'none';
+      }
+
+      // Empty state
       if (noResults) {
-        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        noResults.style.display = matchingItems.length === 0 ? 'block' : 'none';
       }
     }
 
-    searchInput?.addEventListener('input', filterWorks);
-    typeSelect?.addEventListener('change', filterWorks);
-    langSelect?.addEventListener('change', filterWorks);
+    searchInput?.addEventListener('input', () => filterWorks(true));
+    typeSelect?.addEventListener('change', () => filterWorks(true));
+    langSelect?.addEventListener('change', () => filterWorks(true));
+
+    loadMoreBtn?.addEventListener('click', () => {
+      currentPage++;
+      filterWorks(false);
+    });
 
     clearBtn?.addEventListener('click', () => {
       if (searchInput) searchInput.value = '';
-      filterWorks();
+      filterWorks(true);
     });
 
     resetBtn?.addEventListener('click', () => {
       if (searchInput) searchInput.value = '';
       if (typeSelect) typeSelect.value = 'all';
       if (langSelect) langSelect.value = 'all';
-      filterWorks();
+      filterWorks(true);
     });
+
+    // Run initial filter on page mount
+    filterWorks(true);
   }
 
   setupArchiveSearch();

@@ -171,16 +171,21 @@ export function updateWork(id: string, updates: Partial<Work>): Work {
   const existing = works[index];
   const now = new Date().toISOString();
 
-  // If slug is changing, verify uniqueness
+  // If slug is changing, verify uniqueness and record into previousSlugs
+  const previousSlugs = [...(existing.previousSlugs || [])];
   if (updates.slug && updates.slug !== existing.slug) {
     if (works.some(w => w.slug === updates.slug && w.id !== id)) {
       throw new Error(`Slug "${updates.slug}" is already taken by another work.`);
+    }
+    if (!previousSlugs.includes(existing.slug)) {
+      previousSlugs.push(existing.slug);
     }
   }
 
   const merged: Work = {
     ...existing,
     ...updates,
+    previousSlugs,
     id: existing.id, // Immutable ID
     updatedAt: now
   };

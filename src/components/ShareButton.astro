@@ -8,23 +8,38 @@ const { title, url } = Astro.props;
 ---
 
 <div class="share-actions" data-share-container data-title={title} data-url={url || ''}>
-  <button type="button" class="btn btn-outline share-btn" data-share-trigger aria-label="Share this work">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <button type="button" class="btn btn-outline share-btn" data-share-trigger aria-label="Share this work using native menu">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="18" cy="5" r="3"></circle>
       <circle cx="6" cy="12" r="3"></circle>
       <circle cx="18" cy="19" r="3"></circle>
       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
       <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
     </svg>
-    <span>Share Work</span>
+    <span>Share</span>
   </button>
 
   <a class="btn btn-outline whatsapp-btn" data-whatsapp-link target="_blank" rel="noopener noreferrer" aria-label="Share via WhatsApp">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.584 1.761.817 2.802.817l.006-.001c3.177 0 5.763-2.586 5.764-5.767.001-3.181-2.584-5.767-5.776-5.802zm0 10.445c-.879 0-1.637-.253-2.34-.698l-.168-.106-1.574.413.42-1.533-.116-.184c-.482-.767-.736-1.554-.736-2.569 0-2.451 1.994-4.445 4.446-4.445 2.449 0 4.443 1.994 4.444 4.446 0 2.452-1.995 4.475-4.447 4.475zm6.576-13.882c-1.849-1.85-4.306-2.868-6.918-2.868-5.385 0-9.768 4.382-9.771 9.77 0 1.722.45 3.402 1.304 4.881l-1.387 5.068 5.185-1.36c1.42.775 3.023 1.184 4.664 1.185h.005c5.385 0 9.77-4.383 9.772-9.771 0-2.612-1.019-5.07-2.854-6.905z"/>
     </svg>
     <span>WhatsApp</span>
   </a>
+
+  <a class="btn btn-outline twitter-btn" data-twitter-link target="_blank" rel="noopener noreferrer" aria-label="Share on X / Twitter">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+    <span>X</span>
+  </a>
+
+  <button type="button" class="btn btn-outline copy-link-btn" data-copy-trigger aria-label="Copy canonical link to clipboard">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+    </svg>
+    <span>Copy Link</span>
+  </button>
 
   <span class="copy-toast" data-copy-toast aria-live="polite">Link Copied!</span>
 </div>
@@ -70,12 +85,24 @@ const { title, url } = Astro.props;
       
       const shareBtn = container.querySelector('[data-share-trigger]');
       const whatsappBtn = container.querySelector<HTMLAnchorElement>('[data-whatsapp-link]');
+      const twitterBtn = container.querySelector<HTMLAnchorElement>('[data-twitter-link]');
+      const copyBtn = container.querySelector('[data-copy-trigger]');
       const toast = container.querySelector('[data-copy-toast]');
 
       // Configure WhatsApp link
       if (whatsappBtn) {
         whatsappBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' — ' + shareUrl)}`;
       }
+
+      // Configure Twitter / X link
+      if (twitterBtn) {
+        twitterBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`;
+      }
+
+      // Direct Copy Button
+      copyBtn?.addEventListener('click', () => {
+        copyToClipboard(shareUrl, toast);
+      });
 
       shareBtn?.addEventListener('click', async () => {
         if (navigator.share) {

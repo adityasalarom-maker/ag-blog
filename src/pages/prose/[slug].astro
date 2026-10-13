@@ -1,25 +1,64 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareButton from '../../components/ShareButton.astro';
+import WorkCard from '../../components/WorkCard.astro';
 import { WORKS, type Work } from '../../data/fixtures';
+import { getRelatedWorks } from '../../lib/content/relatedWorks.ts';
 
 export function getStaticPaths() {
   const proseWorks = WORKS.filter(w => w.contentType === 'story' || w.contentType === 'essay');
-  return proseWorks.map(work => ({
-    params: { slug: work.slug },
-    props: { work }
-  }));
+  const paths: Array<{ params: { slug: string }; props: { work: Work; isHistorical?: boolean; canonicalSlug?: string } }> = [];
+
+  proseWorks.forEach(work => {
+    // Canonical path
+    paths.push({
+      params: { slug: work.slug },
+      props: { work }
+    });
+
+    // Historical redirect paths if slug was revised
+    if (work.previousSlugs) {
+      work.previousSlugs.forEach(prev => {
+        paths.push({
+          params: { slug: prev },
+          props: { work, isHistorical: true, canonicalSlug: work.slug }
+        });
+      });
+    }
+  });
+
+  return paths;
 }
 
 interface Props {
   work: Work;
+  isHistorical?: boolean;
+  canonicalSlug?: string;
 }
 
-const { work } = Astro.props;
+const { work, isHistorical, canonicalSlug } = Astro.props;
+
+// If accessed via an old historical slug, permanently redirect to canonical URL
+if (isHistorical && canonicalSlug) {
+  return Astro.redirect(`/prose/${canonicalSlug}`, 301);
+}
+
 const isHi = work.language === 'hi' && work.script === 'Deva';
 
 // Split paragraphs
 const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
+
+// Find companion translation if available
+const companionWork = work.translatedEditionSlug 
+  ? WORKS.find(w => w.slug === work.translatedEditionSlug)
+  : null;
+
+const companionPath = companionWork
+  ? (companionWork.contentType === 'poem' ? `/poetry/${companionWork.slug}` : `/prose/${companionWork.slug}`)
+  : undefined;
+
+// Contextual Related Works
+const relatedWorks = getRelatedWorks(work, 3);
 ---
 
 <BaseLayout 
@@ -28,6 +67,12 @@ const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
   image={work.coverImage}
   lang={work.language}
   type="article"
+  alternateLang={companionWork?.language}
+  alternateURL={companionPath}
+  publishedTime={work.publishedAt}
+  modifiedTime={work.updatedAt}
+  author={work.creator}
+  tags={work.tags}
 >
   <!-- Reading Progress Bar -->
   <div class="reading-progress-track" aria-hidden="true">
@@ -81,6 +126,19 @@ const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
       </div>
     </header>
 
+    <!-- Companion Translation Card (Bilingual Feature) -->
+    {companionWork && (
+      <aside class="bilingual-companion-banner" aria-label="Available translation">
+        <div class="companion-icon">⇄</div>
+        <div class="companion-text">
+          <span class="companion-label">Linked Bilingual Edition Available:</span>
+          <a href={companionPath} class="companion-link">
+            {companionWork.title} ({companionWork.language === 'hi' ? 'हिंदी संस्करण' : 'English Edition'}) →
+          </a>
+        </div>
+      </aside>
+    )}
+
     <!-- Hero Image if present -->
     {work.coverImage && (
       <figure class="prose-hero-media">
@@ -126,6 +184,21 @@ const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
         </div>
       </div>
     </section>
+
+    <!-- Related Works Section (Bilingual Recommendation Engine) -->
+    {relatedWorks.length > 0 && (
+      <section class="related-works-section" aria-label="Related works">
+        <div class="related-heading-row">
+          <h2 class="related-title">Related Works • संबंधित रचनाएँ</h2>
+          <span class="related-sub">Contextually curated from the anthology</span>
+        </div>
+        <div class="related-grid">
+          {relatedWorks.map((rel) => (
+            <WorkCard work={rel} />
+          ))}
+        </div>
+      </section>
+    )}
 
     <!-- Bottom Navigation -->
     <div class="prose-bottom-nav">
@@ -335,6 +408,77 @@ const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
     color: var(--text-muted);
     border-top: 1px solid var(--border-subtle);
     padding-top: var(--space-2);
+  }
+
+  /* Bilingual Translation Banner */
+  .bilingual-companion-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-10);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .companion-icon {
+    font-size: 1.5rem;
+    color: var(--accent-gold);
+  }
+
+  .companion-label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .companion-link {
+    font-family: var(--font-masthead);
+    font-size: var(--text-base);
+    color: var(--accent-crimson);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .companion-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Related Works */
+  .related-works-section {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .related-heading-row {
+    margin-bottom: var(--space-6);
+  }
+
+  .related-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .related-sub {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-6);
   }
 
   .prose-bottom-nav {

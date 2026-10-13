@@ -72,6 +72,8 @@ export const workSchema = z.object({
   quoteSource: quoteSourceSchema.optional(),
   artworkDetails: artworkDetailsSchema.optional(),
   rights: rightsDeclarationSchema,
+  // Historical slugs for permanent redirect stability if a title/slug is revised
+  previousSlugs: z.array(z.string()).default([]),
   // Sensitive internal notes: kept off public APIs
   internalNotes: z.string().optional()
 });

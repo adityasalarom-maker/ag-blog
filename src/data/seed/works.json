@@ -11,18 +11,28 @@
     "body": "धुंधले आकाश की छांव तले,\nजलते हुए दीये की कांपती लौ में,\nसमय ने अपनी परछाईं को\nचुपचाप जल की सतह पर समेट लिया।\n\nनाव बंधी है उस पुराने खंभे से,\nजैसे कोई भूली हुई प्रतिज्ञा\nसदियों के मौन के बाद भी\nलहरों की प्रतीक्षा में ठहरी हो।\n\nएक सन्नाटा उतरता है पेड़ों की डालियों से,\nसांझ की स्याही में घुलता हुआ;\nजो शब्द होंठों तक न आ सके,\nवे अब हवाओं की सांझ-वंदना हैं।\n\nहम सब केवल यात्री हैं उस किनारे के,\nजहाँ यादों की लहरें आती हैं,\nछूकर लौट जाती हैं पाषाण को,\nऔर पीछे रह जाती है केवल भीगी रेत।",
     "coverImage": "/images/artworks/twilight_melancholy.jpg",
     "coverAlt": "शाम के धुंधलके में नदी किनारे दीपक जलाए एक शांत आकृति का जलरंग चित्र",
+    "status": "published",
     "publishedAt": "2026-10-10T18:30:00Z",
     "updatedAt": "2026-10-10T18:30:00Z",
-    "status": "published",
-    "tags": ["स्मृति", "सांझ", "प्रतीक्षा", "शांत रस"],
-    "categories": ["कविता"],
-    "collectionSlugs": ["monsoon-melancholy"],
+    "tags": [
+      "स्मृति",
+      "सांझ",
+      "प्रतीक्षा",
+      "शांत रस"
+    ],
+    "categories": [
+      "कविता"
+    ],
+    "collectionSlugs": [
+      "monsoon-melancholy"
+    ],
     "rights": {
       "declaredBy": "ए. जी. वर्मा",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "रचनाकार द्वारा मौलिक घोषित रचना। सर्वाधिकार सुरक्षित।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "poem-en-01",
@@ -36,18 +46,28 @@
     "body": "There is an ancient masonry in evening rain,\nstone upon stone laid without mortar or haste,\nwhere every silence earns its quiet arch\nabove the cold and uncomplaining waste.\n\nThe lanterns swing on gallows made of pine,\namber beacons spilling gold on dark moss,\nnot to invite the wanderer to rest,\nbut marking where the living pathways cross.\n\nWe measure distance not by stone or stride,\nbut by the shadows lengthening between\nthe thoughts we dare to utter in the light\nand all the inward thresholds left unseen.\n\nStep gently here: the forest keeps no clock.\nThe crescent moon climbs upward through the firs,\nand night becomes a cathedral of stone\nwherein no bell, no spoken prayer stirs.",
     "coverImage": "/images/artworks/silent_valley.jpg",
     "coverAlt": "Oil painting of a stone staircase winding through a pine forest under a crescent moon with glowing lanterns",
+    "status": "published",
     "publishedAt": "2026-10-11T14:15:00Z",
     "updatedAt": "2026-10-11T14:15:00Z",
-    "status": "published",
-    "tags": ["Solitude", "Night", "Silence", "Nature"],
-    "categories": ["Poetry"],
-    "collectionSlugs": ["thresholds-of-becoming"],
+    "tags": [
+      "Solitude",
+      "Night",
+      "Silence",
+      "Nature"
+    ],
+    "categories": [
+      "Poetry"
+    ],
+    "collectionSlugs": [
+      "thresholds-of-becoming"
+    ],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original work declared by the creator. All rights reserved."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "poem-pair-hi",
@@ -61,11 +81,18 @@
     "body": "समय कोई स्थिर तट नहीं है,\nयह तो बहता हुआ अनवरत प्रवाह है,\nजिसमें हम सब तैरती हुई पत्तियां हैं\nकिनारे की तलाश में बेबस।\n\nन अतीत ठहरता है हमारी मुट्ठी में,\nन भविष्य की कोई निश्चित राह है;\nजो है, वह बस यही एक श्वास है,\nजो बहते पानी पर खींची गई लकीर है।\n\nसुनो उस धारा का धीमा संगीत,\nवह किसी का विलाप नहीं,\nकेवल निरंतर होने की\nएक अनंत स्वीकृति है।",
     "coverImage": "/images/artworks/akshar_mandala.jpg",
     "coverAlt": "देवनागरी लिपि में रचित वृत्ताकार कलात्मक मंडल",
+    "status": "published",
     "publishedAt": "2026-10-12T09:00:00Z",
     "updatedAt": "2026-10-12T09:00:00Z",
-    "status": "published",
-    "tags": ["काल", "प्रवाह", "दर्शन", "द्विभाषी"],
-    "categories": ["कविता"],
+    "tags": [
+      "काल",
+      "प्रवाह",
+      "दर्शन",
+      "द्विभाषी"
+    ],
+    "categories": [
+      "कविता"
+    ],
     "translatedEditionSlug": "the-river-of-time",
     "translatedEditionTitle": "The River of Time (English Edition)",
     "translatedEditionLang": "en",
@@ -74,7 +101,8 @@
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "रचनाकार द्वारा घोषित मौलिक कृति। अंग्रेजी अनुवाद उपलब्ध।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "poem-pair-en",
@@ -88,11 +116,18 @@
     "body": "Time is no stationary shore,\nbut an unceasing, sovereign tide\nwherein we drift like autumn leaves\nwith neither anchor nor a guide.\n\nThe past slips through our tightened palms,\nthe future keeps no charted line;\nall that remains is this brief breath,\na ripple carved in cold design.\n\nListen to the river’s quiet chant:\nit mourns no loss, it seeks no throne,\nit is the pure, unbroken grace\nof moving forward all alone.",
     "coverImage": "/images/artworks/akshar_mandala.jpg",
     "coverAlt": "Calligraphic geometric mandala on handmade paper",
+    "status": "published",
     "publishedAt": "2026-10-12T09:00:00Z",
     "updatedAt": "2026-10-12T09:00:00Z",
-    "status": "published",
-    "tags": ["Time", "Stream", "Philosophy", "Bilingual"],
-    "categories": ["Poetry"],
+    "tags": [
+      "Time",
+      "Stream",
+      "Philosophy",
+      "Bilingual"
+    ],
+    "categories": [
+      "Poetry"
+    ],
     "translatedEditionSlug": "samay-ki-nadi",
     "translatedEditionTitle": "समय की नदी (हिंदी संस्करण)",
     "translatedEditionLang": "hi",
@@ -101,7 +136,8 @@
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original work declared by the creator. Hindi companion edition linked."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "prose-en-01",
@@ -115,19 +151,29 @@
     "body": "In the high vaulted library overlooking the misty river bends, Master Hemant spent fifty winters mending letters that were never delivered. The archive did not collect treaties of kings or tax rolls of forgotten provinces. Its shelves held only intimate hesitations: unsent confessions penned on mulberry bark, apologies smudged with dried ink, and botanical notes scribbled on the margins of prayer books.\n\n\"A letter that reaches its destination,\" he would say, adjusting his bronze spectacles over tired eyes, \"becomes a fact. But a letter that was folded, sealed, and kept in a cedar drawer remains a prayer. It never encounters the world's disappointment.\"\n\nThe room smelled perpetually of cedarwood oil, dried gum arabic, and damp river stones. Outside, the monsoon arrived with the roar of swollen currents, beating against the ironwood shutters. On his workbench lay an unbound manuscript from the seventeenth century—folios written in fluid Devanagari script, the ink formulated from crushed pomegranate rinds and soot.\n\nHe worked with camel-hair brushes and wheat-starch paste, feathering the frayed edges of each folio. To restore a page was not to erase its decay; it was to give its vulnerability enough strength to survive another human gaze.\n\nWhen the twilight settled and the temple gongs resonated across the water, Hemant lit his small brass lantern. He believed that literature does not belong to the empires that commission it, but to the solitary readers who find within its cadence the courage to endure their own unrecorded nights.",
     "coverImage": "/images/artworks/twilight_melancholy.jpg",
     "coverAlt": "Quiet riverside dwelling illuminated by a solitary lantern in the twilight rain",
+    "status": "published",
     "publishedAt": "2026-10-08T11:00:00Z",
     "updatedAt": "2026-10-08T11:00:00Z",
-    "status": "published",
+    "tags": [
+      "Literature",
+      "Memory",
+      "Storytelling",
+      "Archives"
+    ],
+    "categories": [
+      "Prose & Stories"
+    ],
+    "collectionSlugs": [
+      "monsoon-melancholy"
+    ],
     "readingTimeMinutes": 4,
-    "tags": ["Literature", "Memory", "Storytelling", "Archives"],
-    "categories": ["Prose & Stories"],
-    "collectionSlugs": ["monsoon-melancholy"],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original literary fiction declared by author A. G. Varma."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "prose-hi-01",
@@ -141,19 +187,29 @@
     "body": "साहित्य और कला का इतिहास केवल शब्दों का संग्रह नहीं है; यह उस मौन का मानचित्र भी है जिसे वाणी ने स्पर्श करने का साहस किया। जब हम किसी महान कविता या गंभीर गद्य के सम्मुख होते हैं, तो जो ध्वनि कान में गूंजती है, वह केवल प्रवेश द्वार है। वास्तविक अर्थ तो उस ठहराव में खिलता है जो दो छंदों या दो वाक्यों के मध्य घटित होता है।\n\nभारतीय काव्यशास्त्र में 'ध्वनि' का सिद्धांत इसी तथ्य को रेखांकित करता है। वाच्य अर्थ तो केवल स्थूल शरीर है, जबकि व्यंग्य—वह जो संकेतित है, जो शब्दों की सीमा के पार इंगित करता है—वही काव्य की सच्ची आत्मा है।\n\nआज के इस कोलाहलपूर्ण युग में, जहाँ सूचना का अतिरेक विचार के अवकाश को संकुचित कर रहा है, लेखक और कलाकार का दायित्व केवल नए शब्द गढ़ना नहीं, बल्कि पाठकों के भीतर मौन के एकांत को पुनः प्रतिष्ठित करना है। एक शब्द तब तक सार्थक नहीं हो सकता जब तक उसके पीछे एक गहरा सन्नाटा न हो जो उसे आधार दे सके।\n\nजब हम किसी चित्र के कोरे कैनवास को देखते हैं, या किसी कविता के अंत में लगे रिक्त स्थान को निहारते हैं, तो हमें ज्ञात होता है कि सृजन शून्य से नहीं उपजता; वह उस विस्मयकारी मौन की संतान है जो हमारे भीतर निरंतर बह रहा है।",
     "coverImage": "/images/artworks/silent_valley.jpg",
     "coverAlt": "रात के सन्नाटे में देवदार के वनों से गुजरता पाषाण पथ",
+    "status": "published",
     "publishedAt": "2026-10-09T16:00:00Z",
     "updatedAt": "2026-10-09T16:00:00Z",
-    "status": "published",
+    "tags": [
+      "दर्शन",
+      "काव्यशास्त्र",
+      "मौन",
+      "सृजन"
+    ],
+    "categories": [
+      "निबंध व विचार"
+    ],
+    "collectionSlugs": [
+      "thresholds-of-becoming"
+    ],
     "readingTimeMinutes": 5,
-    "tags": ["दर्शन", "काव्यशास्त्र", "मौन", "सृजन"],
-    "categories": ["निबंध व विचार"],
-    "collectionSlugs": ["thresholds-of-becoming"],
     "rights": {
       "declaredBy": "ए. जी. वर्मा",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "मौलिक निबंध रचनाकार द्वारा घोषित। सर्वाधिकार सुरक्षित।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "thought-hi-01",
@@ -165,17 +221,24 @@
     "creator": "ए. जी. वर्मा",
     "excerpt": "कुछ बातें मौन में ही अपना अर्थ खोज पाती हैं...",
     "body": "कुछ बातें मौन में ही अपना अर्थ खोज पाती हैं; शब्दों में आकर वे केवल गूँज बनकर रह जाती हैं।",
+    "status": "published",
     "publishedAt": "2026-10-13T08:00:00Z",
     "updatedAt": "2026-10-13T08:00:00Z",
-    "status": "published",
-    "tags": ["विचार", "मौन", "अphorism"],
-    "categories": ["विचार व सूक्तियां"],
+    "tags": [
+      "विचार",
+      "मौन",
+      "अphorism"
+    ],
+    "categories": [
+      "विचार व सूक्तियां"
+    ],
     "rights": {
       "declaredBy": "ए. जी. वर्मा",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "मौलिक विचार रचनाकार द्वारा घोषित।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "thought-ro-01",
@@ -187,17 +250,24 @@
     "creator": "A. G. Varma",
     "excerpt": "Khaamoshiyon ka bhi ek daur hota hai...",
     "body": "Khaamoshiyon ka bhi ek daur hota hai, jahan har lafz be-awaaz apna wajood dhoondhta hai.",
+    "status": "published",
     "publishedAt": "2026-10-13T10:30:00Z",
     "updatedAt": "2026-10-13T10:30:00Z",
-    "status": "published",
-    "tags": ["Romanized Hindi", "Reflection", "Words"],
-    "categories": ["Thoughts & Quotations"],
+    "tags": [
+      "Romanized Hindi",
+      "Reflection",
+      "Words"
+    ],
+    "categories": [
+      "Thoughts & Quotations"
+    ],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original reflection in Romanized Hindi."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "thought-en-01",
@@ -209,17 +279,24 @@
     "creator": "A. G. Varma",
     "excerpt": "Solitude is not the absence of the world...",
     "body": "Solitude is not the absence of the world, but the quiet arrival of one's own voice.",
+    "status": "published",
     "publishedAt": "2026-10-13T12:00:00Z",
     "updatedAt": "2026-10-13T12:00:00Z",
-    "status": "published",
-    "tags": ["Solitude", "Voice", "Stillness"],
-    "categories": ["Thoughts & Quotations"],
+    "tags": [
+      "Solitude",
+      "Voice",
+      "Stillness"
+    ],
+    "categories": [
+      "Thoughts & Quotations"
+    ],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original creator aphorism."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "quote-01",
@@ -231,11 +308,18 @@
     "creator": "Mirza Asadullah Khan Ghalib",
     "excerpt": "न था कुछ तो ख़ुदा था कुछ न होता तो ख़ुदा होता...",
     "body": "न था कुछ तो ख़ुदा था कुछ न होता तो ख़ुदा होता\nडुबोया मुझ को होने ने न होता मैं तो क्या होता",
+    "status": "published",
     "publishedAt": "2026-10-07T10:00:00Z",
     "updatedAt": "2026-10-07T10:00:00Z",
-    "status": "published",
-    "tags": ["उर्दू शायरी", "ग़ालिब", "अस्तित्ववाद", "उद्धरण"],
-    "categories": ["विचार व सूक्तियां"],
+    "tags": [
+      "उर्दू शायरी",
+      "ग़ालिब",
+      "अस्तित्ववाद",
+      "उद्धरण"
+    ],
+    "categories": [
+      "विचार व सूक्तियां"
+    ],
     "quoteSource": {
       "author": "मिर्ज़ा असदुल्लाह ख़ान 'ग़ालिब' (1797–1869)",
       "workTitle": "दीवान-ए-ग़ालिब (ग़ज़ल संख्या 32)",
@@ -248,7 +332,8 @@
       "declarationType": "Public Domain Attributed",
       "status": "Attributed",
       "notice": "सार्वजनिक कार्यक्षेत्र (Public Domain) से उद्धृत शास्त्रीय रचना। साहित्यिक सन्दर्भ हेतु प्रस्तुत।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "quote-02",
@@ -260,11 +345,18 @@
     "creator": "Virginia Woolf",
     "excerpt": "Lock up your libraries if you like; but there is no gate, no lock, no bolt...",
     "body": "\"Lock up your libraries if you like; but there is no gate, no lock, no bolt that you can set upon the freedom of my mind.\"",
+    "status": "published",
     "publishedAt": "2026-10-07T14:00:00Z",
     "updatedAt": "2026-10-07T14:00:00Z",
-    "status": "published",
-    "tags": ["Literary Quotation", "Freedom", "Books", "Feminism"],
-    "categories": ["Thoughts & Quotations"],
+    "tags": [
+      "Literary Quotation",
+      "Freedom",
+      "Books",
+      "Feminism"
+    ],
+    "categories": [
+      "Thoughts & Quotations"
+    ],
     "quoteSource": {
       "author": "Virginia Woolf (1882–1941)",
       "workTitle": "A Room of One's Own, Chapter 4",
@@ -277,7 +369,8 @@
       "declarationType": "Public Domain Attributed",
       "status": "Attributed",
       "notice": "Quotation reproduced for literary reflection and commentary under fair dealing."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "art-01",
@@ -291,12 +384,21 @@
     "body": "Executed in transparent watercolor and gouache washes on handmade Arches cold-press cotton paper. The work captures the liminal stillness of dusk in rural Bengal, where water, mist, and the warm glow of kerosene lamplight merge into an emblem of solitary waiting.",
     "coverImage": "/images/artworks/twilight_melancholy.jpg",
     "coverAlt": "Watercolor painting of a lone figure with a lantern on a wooden river dock at dusk with a canoe",
+    "status": "published",
     "publishedAt": "2026-10-05T12:00:00Z",
     "updatedAt": "2026-10-05T12:00:00Z",
-    "status": "published",
-    "tags": ["Watercolor", "Monsoon", "Twilight", "Atmospheric"],
-    "categories": ["Visual Art Gallery"],
-    "collectionSlugs": ["monsoon-melancholy"],
+    "tags": [
+      "Watercolor",
+      "Monsoon",
+      "Twilight",
+      "Atmospheric"
+    ],
+    "categories": [
+      "Visual Art Gallery"
+    ],
+    "collectionSlugs": [
+      "monsoon-melancholy"
+    ],
     "artworkDetails": {
       "medium": "Watercolor & Gouache on 300gsm Cotton Rag",
       "yearCreated": 2026,
@@ -308,7 +410,8 @@
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original artwork created by A. G. Varma. Reproduction without permission prohibited."
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "art-02",
@@ -322,12 +425,21 @@
     "body": "चाय के काढ़े से रंगे हस्तनिर्मित सन-पत्र (Parchment) पर काली स्याही और सिंदूरी रंग से अंकित पारंपरिक लिपि-मंडल। इसमें देवनागरी लिपि के ध्वन्यात्मक सौंदर्य और वृत्ताकार संतुलन का समन्वय किया गया है।",
     "coverImage": "/images/artworks/akshar_mandala.jpg",
     "coverAlt": "काली और सिंदूरी स्याही से हस्तनिर्मित कागज पर बना देवनागरी अक्षरों का वृत्ताकार मंडल",
+    "status": "published",
     "publishedAt": "2026-10-06T14:30:00Z",
     "updatedAt": "2026-10-06T14:30:00Z",
-    "status": "published",
-    "tags": ["कैलीग्राफी", "देवनागरी", "मंडल", "हस्तकला"],
-    "categories": ["दृश्य कला वीथिका"],
-    "collectionSlugs": ["thresholds-of-becoming"],
+    "tags": [
+      "कैलीग्राफी",
+      "देवनागरी",
+      "मंडल",
+      "हस्तकला"
+    ],
+    "categories": [
+      "दृश्य कला वीथिका"
+    ],
+    "collectionSlugs": [
+      "thresholds-of-becoming"
+    ],
     "artworkDetails": {
       "medium": "Traditional Iron-Gall Ink & Cinnabar on Tea-Stained Paper",
       "yearCreated": 2026,
@@ -339,7 +451,8 @@
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "मौलिक कलाकृति रचनाकार द्वारा घोषित। सर्वाधिकार सुरक्षित।"
-    }
+    },
+    "previousSlugs": []
   },
   {
     "id": "art-03",
@@ -353,12 +466,21 @@
     "body": "Heavy body oil painting on Belgian linen canvas with palette knife impasto textures. Explores the contemplative stillness of high mountain paths at night, anchored by the comforting amber beacon of trail lanterns.",
     "coverImage": "/images/artworks/silent_valley.jpg",
     "coverAlt": "Oil painting of a stone staircase winding through a pine forest under a crescent moon with glowing lanterns",
+    "status": "published",
     "publishedAt": "2026-10-07T17:00:00Z",
     "updatedAt": "2026-10-07T17:00:00Z",
-    "status": "published",
-    "tags": ["Oil Painting", "Nightscape", "Mountains", "Impasto"],
-    "categories": ["Visual Art Gallery"],
-    "collectionSlugs": ["thresholds-of-becoming"],
+    "tags": [
+      "Oil Painting",
+      "Nightscape",
+      "Mountains",
+      "Impasto"
+    ],
+    "categories": [
+      "Visual Art Gallery"
+    ],
+    "collectionSlugs": [
+      "thresholds-of-becoming"
+    ],
     "artworkDetails": {
       "medium": "Oil on Linen Canvas",
       "yearCreated": 2026,
@@ -370,9 +492,9 @@
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Original painting declared by A. G. Varma. All rights reserved."
-    }
+    },
+    "previousSlugs": []
   },
-
   {
     "id": "draft-poem-unreleased",
     "title": "Unfinished Nocturne",
@@ -383,17 +505,24 @@
     "creator": "A. G. Varma",
     "excerpt": "Draft stanza testing privacy boundary: this poem must never leak to public endpoints...",
     "body": "This is a private unreleased draft stanza.\nIt is kept in the editorial repository\nand must never appear on public reading pages or sitemaps.",
+    "status": "draft",
     "publishedAt": "2026-10-14T01:00:00Z",
     "updatedAt": "2026-10-14T01:00:00Z",
-    "status": "draft",
-    "tags": ["Draft", "Private", "Testing"],
-    "categories": ["Poetry"],
+    "tags": [
+      "Draft",
+      "Private",
+      "Testing"
+    ],
+    "categories": [
+      "Poetry"
+    ],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Private unpublished draft."
     },
+    "previousSlugs": [],
     "internalNotes": "Work in progress. Do not publish."
   },
   {
@@ -406,17 +535,23 @@
     "creator": "A. G. Varma",
     "excerpt": "Internal planning notes testing the isolation of confidential materials from public builds...",
     "body": "Private planning document discussing upcoming themes and private rights documentation.",
+    "status": "draft",
     "publishedAt": "2026-10-14T01:00:00Z",
     "updatedAt": "2026-10-14T01:00:00Z",
-    "status": "draft",
-    "tags": ["Internal", "Draft"],
-    "categories": ["Editorial"],
+    "tags": [
+      "Internal",
+      "Draft"
+    ],
+    "categories": [
+      "Editorial"
+    ],
     "rights": {
       "declaredBy": "A. G. Varma",
       "declarationType": "Original Creator",
       "status": "Creator-Declared",
       "notice": "Confidential internal note."
     },
+    "previousSlugs": [],
     "internalNotes": "Confidential planning. Strictly isolated."
   }
 ]

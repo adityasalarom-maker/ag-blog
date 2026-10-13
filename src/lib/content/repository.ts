@@ -52,12 +52,30 @@ export function getAllPublishedWorks(): Work[] {
 }
 
 /**
- * Public Data Access: Get a single published work by its canonical URL slug.
+ * Public Data Access: Get a single published work by its canonical URL slug or historical slug.
  * Returns undefined if the work does not exist or is in draft/archived state.
  */
 export function getPublishedWorkBySlug(slug: string): Work | undefined {
-  const work = currentWorks.find(w => w.slug === slug && w.status === 'published');
+  const work = currentWorks.find(w => 
+    (w.slug === slug || (w.previousSlugs && w.previousSlugs.includes(slug))) && 
+    w.status === 'published'
+  );
   return work ? sanitizePublicWork(work) : undefined;
+}
+
+/**
+ * Checks if a requested slug is an older historical slug that should redirect to the canonical slug.
+ */
+export function getWorkSlugRedirect(slug: string): { redirect: boolean; canonicalSlug?: string } {
+  const work = currentWorks.find(w => 
+    w.status === 'published' && 
+    w.previousSlugs && 
+    w.previousSlugs.includes(slug)
+  );
+  if (work && work.slug !== slug) {
+    return { redirect: true, canonicalSlug: work.slug };
+  }
+  return { redirect: false };
 }
 
 /**
@@ -156,7 +174,7 @@ export function searchPublishedWorks(options: {
       work.creator.toLowerCase().includes(query);
 
     const matchesType = type === 'all' || work.contentType === type;
-    const matchesLang = lang === 'all' || `${work.language}-${work.script}` === lang;
+    const matchesLang = lang === 'all' || work.language === lang || `${work.language}-${work.script}` === lang;
 
     return matchesQuery && matchesType && matchesLang;
   });
