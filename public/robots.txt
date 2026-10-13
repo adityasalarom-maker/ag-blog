@@ -1,0 +1,7 @@
+# robots.txt for Antigravity Review
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/admin/
+
+Sitemap: https://ag-literary-publication.pages.dev/sitemap.xml

@@ -2,15 +2,25 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import { WORKS } from '../../data/fixtures';
+import { getQuotationSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 const thoughts = WORKS.filter(w => w.contentType === 'thought');
 const quotes = WORKS.filter(w => w.contentType === 'quote');
 const allItems = [...thoughts, ...quotes];
+
+const thoughtsSchemas = [
+  ...quotes.map(q => getQuotationSchema(q, `https://ag-literary-publication.pages.dev/thoughts#${q.slug}`)),
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Thoughts & Quotes', url: '/thoughts' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Thoughts & Attributed Quotations (विचार व सूक्तियां) — Antigravity Review"
   description="A curated repository of original philosophical aphorisms and verified literary quotations, strictly separating creator thoughts from classical attributions."
+  schema={thoughtsSchemas}
 >
   <div class="container page-container">
     <header class="page-header">

@@ -43,7 +43,11 @@ const navItems = [
     <div class="masthead-center">
       <a href="/" class="masthead-brand" aria-label="Antigravity Review Home">
         <span class="masthead-ornament">✦</span>
-        <h1 class="masthead-name">{PUBLICATION_INFO.name}</h1>
+        {currentPath === '/' ? (
+          <h1 class="masthead-name">{PUBLICATION_INFO.name}</h1>
+        ) : (
+          <span class="masthead-name">{PUBLICATION_INFO.name}</span>
+        )}
         <span class="masthead-name-hi">{PUBLICATION_INFO.nameHi}</span>
         <span class="masthead-ornament">✦</span>
       </a>

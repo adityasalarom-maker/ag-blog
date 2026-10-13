@@ -2,13 +2,22 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WorkCard from '../../components/WorkCard.astro';
 import { WORKS } from '../../data/fixtures';
+import { getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 const proseWorks = WORKS.filter(w => w.contentType === 'story' || w.contentType === 'essay');
+
+const proseSchemas = [
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Prose & Essays', url: '/prose' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Stories & Essays (कथा व निबंध) — Antigravity Review"
   description="Immersive long-form fiction, literary essays, and philosophical reflections in English and Hindi."
+  schema={proseSchemas}
 >
   <div class="container page-container">
     <header class="page-header">

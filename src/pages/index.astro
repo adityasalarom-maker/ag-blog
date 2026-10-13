@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { WORKS, COLLECTIONS, PUBLICATION_INFO } from '../data/fixtures';
+import { getWebSiteSchema, getPeriodicalSchema } from '../lib/seo/schema.ts';
 
 // Select featured works
 const heroPoem = WORKS.find(w => w.slug === 'smritiyon-ki-dehari-par')!;
@@ -10,11 +11,17 @@ const featuredArtworks = WORKS.filter(w => w.contentType === 'artwork');
 const recentWorks = WORKS.filter(w => w.slug !== heroPoem.slug && w.slug !== leadStory.slug).slice(0, 4);
 const featuredThought = WORKS.find(w => w.slug === 'maun-ka-arth')!;
 const featuredQuote = WORKS.find(w => w.slug === 'mirza-ghalib-na-tha-kuch-to-khuda-tha')!;
+
+const homeSchemas = [
+  getWebSiteSchema(),
+  getPeriodicalSchema()
+];
 ---
 
 <BaseLayout 
   title="Antigravity Review — A Creator-Led Bilingual Journal"
   description="A publication dedicated to contemplative reading, bilingual poetry in Hindi and English, long-form essays, and fine visual artworks."
+  schema={homeSchemas}
 >
   <!-- Hero Section: Editorial Lead Feature -->
   <section class="hero-section" aria-labelledby="hero-heading">

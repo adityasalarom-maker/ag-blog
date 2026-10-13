@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ArtworkModal from '../components/ArtworkModal.astro';
+import { getWebSiteSchema } from '../lib/seo/schema.ts';
 import '../styles/global.css';
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
   modifiedTime?: string;
   author?: string;
   tags?: string[];
+  schema?: Record<string, any> | Array<Record<string, any>>;
 }
 
 const {
@@ -29,12 +31,14 @@ const {
   publishedTime,
   modifiedTime,
   author,
-  tags = []
+  tags = [],
+  schema
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ag-literary-publication.pages.dev');
 const socialImageURL = new URL(image, Astro.site || 'https://ag-literary-publication.pages.dev');
 const alternateHref = alternateURL ? new URL(alternateURL, Astro.site || 'https://ag-literary-publication.pages.dev') : undefined;
+const activeSchema = schema || getWebSiteSchema();
 ---
 
 <!doctype html>
@@ -98,6 +102,9 @@ const alternateHref = alternateURL ? new URL(alternateURL, Astro.site || 'https:
         // Fallback gracefully if localStorage is restricted
       }
     </script>
+
+    <!-- Structured Data (JSON-LD Schema.org) -->
+    <script type="application/ld+json" set:html={JSON.stringify(activeSchema)} />
   </head>
 
   <body id="top">

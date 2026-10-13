@@ -60,6 +60,18 @@ const companionPath = companionWork
 
 // Contextual Related Works
 const relatedWorks = getRelatedWorks(poem, 3);
+
+// Structured Data (JSON-LD)
+import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
+const currentUrl = new URL(Astro.url.pathname, Astro.site || 'https://ag-literary-publication.pages.dev').toString();
+const poemSchemas = [
+  getArticleSchema(poem, currentUrl),
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Poetry', url: '/poetry' },
+    { name: poem.title, url: `/poetry/${poem.slug}` }
+  ])
+];
 ---
 
 <BaseLayout 
@@ -74,6 +86,7 @@ const relatedWorks = getRelatedWorks(poem, 3);
   modifiedTime={poem.updatedAt}
   author={poem.creator}
   tags={poem.tags}
+  schema={poemSchemas}
 >
   <div class="container poem-page-container">
     <!-- Breadcrumb & Navigation -->

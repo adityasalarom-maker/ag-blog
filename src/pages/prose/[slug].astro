@@ -60,6 +60,18 @@ const companionPath = companionWork
 
 // Contextual Related Works
 const relatedWorks = getRelatedWorks(work, 3);
+
+// Structured Data (JSON-LD)
+import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
+const currentUrl = new URL(Astro.url.pathname, Astro.site || 'https://ag-literary-publication.pages.dev').toString();
+const proseSchemas = [
+  getArticleSchema(work, currentUrl),
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Prose & Essays', url: '/prose' },
+    { name: work.title, url: `/prose/${work.slug}` }
+  ])
+];
 ---
 
 <BaseLayout 
@@ -74,6 +86,7 @@ const relatedWorks = getRelatedWorks(work, 3);
   modifiedTime={work.updatedAt}
   author={work.creator}
   tags={work.tags}
+  schema={proseSchemas}
 >
   <!-- Reading Progress Bar -->
   <div class="reading-progress-track" aria-hidden="true">

@@ -2,13 +2,22 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WorkCard from '../../components/WorkCard.astro';
 import { WORKS } from '../../data/fixtures';
+import { getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 const poems = WORKS.filter(w => w.contentType === 'poem');
+
+const poetrySchemas = [
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Poetry', url: '/poetry' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Poetry Anthology (कविता संग्रह) — Antigravity Review"
   description="Contemplative bilingual verses in Hindi (Devanagari) and English, exploring memory, solitude, time, and philosophical horizons."
+  schema={poetrySchemas}
 >
   <div class="container page-container">
     <header class="page-header">

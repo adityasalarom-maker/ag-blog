@@ -1,11 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { COLLECTIONS, WORKS } from '../../data/fixtures';
+import { getBreadcrumbSchema } from '../../lib/seo/schema.ts';
+
+const collectionSchemas = [
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Collections', url: '/collections' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Thematic Collections (संपादकीय संग्रह) — Antigravity Review"
   description="Curated literary and visual anthologies grouping poems, essays, and artworks around unified contemplative themes."
+  schema={collectionSchemas}
 >
   <div class="container page-container">
     <header class="page-header">

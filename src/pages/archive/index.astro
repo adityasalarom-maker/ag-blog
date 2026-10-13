@@ -2,11 +2,20 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WorkCard from '../../components/WorkCard.astro';
 import { WORKS } from '../../data/fixtures';
+import { getBreadcrumbSchema } from '../../lib/seo/schema.ts';
+
+const archiveSchemas = [
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Library Archives', url: '/archive' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Complete Library Archive & Search (पुस्तकालय संग्रह) — Antigravity Review"
   description="Search and filter the complete bilingual catalog of poems, essays, short stories, aphorisms, and visual artworks."
+  schema={archiveSchemas}
 >
   <div class="container page-container">
     <header class="page-header">

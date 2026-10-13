@@ -1,13 +1,22 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { WORKS } from '../../data/fixtures';
+import { getVisualArtworkSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 const artworks = WORKS.filter(w => w.contentType === 'artwork');
+const gallerySchemas = [
+  ...artworks.map(art => getVisualArtworkSchema(art, `https://ag-literary-publication.pages.dev/gallery#${art.slug}`)),
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Art Gallery', url: '/gallery' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="Visual Art & Craft Gallery (दृश्य कला वीथिका) — Antigravity Review"
   description="High-resolution visual art, traditional Devanagari calligraphy, watercolor landscapes, and oil paintings by creator A. G. Varma."
+  schema={gallerySchemas}
 >
   <div class="container page-container">
     <header class="page-header">

@@ -92,7 +92,12 @@
       } else {
         document.documentElement.removeAttribute('data-zen-mode');
       }
+      toggleBtn?.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+
+    // Initialize aria-pressed state
+    const initialZen = document.documentElement.getAttribute('data-zen-mode') === 'true';
+    toggleBtn?.setAttribute('aria-pressed', initialZen ? 'true' : 'false');
 
     toggleBtn?.addEventListener('click', () => {
       const isCurrentlyZen = document.documentElement.getAttribute('data-zen-mode') === 'true';

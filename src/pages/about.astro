@@ -1,11 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { PUBLICATION_INFO } from '../data/fixtures';
+import { getPeriodicalSchema, getBreadcrumbSchema } from '../lib/seo/schema.ts';
+
+const aboutSchemas = [
+  getPeriodicalSchema(),
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'About & Credits', url: '/about' }
+  ])
+];
 ---
 
 <BaseLayout 
   title="About the Publication & Editorial Policy — Antigravity Review"
   description="The vision, creator profile, copyright and rights declaration policy, and reader privacy charter of the Antigravity Review."
+  schema={aboutSchemas}
 >
   <div class="container about-page-container">
     <header class="about-header">
