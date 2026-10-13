@@ -1,0 +1,32 @@
+[
+  {
+    "id": "col-01",
+    "slug": "monsoon-melancholy",
+    "title": "Monsoon Melancholy",
+    "titleHi": "सावन की स्मृतियाँ",
+    "description": "An anthology of rain-soaked verses, solitary river twilight, and letters preserved across generations.",
+    "curatorNote": "This collection brings together poetry, prose, and watercolor painting sharing the contemplative emotional register of Indian monsoon twilights.",
+    "coverImage": "/images/artworks/twilight_melancholy.jpg",
+    "itemSlugs": [
+      "smritiyon-ki-dehari-par",
+      "the-keeper-of-forgotten-manuscripts",
+      "the-melancholy-of-twilight"
+    ]
+  },
+  {
+    "id": "col-02",
+    "slug": "thresholds-of-becoming",
+    "title": "Thresholds of Becoming",
+    "titleHi": "सृजन की देहरी",
+    "description": "An exploration of creative solitude, philosophical silence, and calligraphic devotion.",
+    "curatorNote": "Exploring how silence and disciplined practice nurture the interior architecture of the maker.",
+    "coverImage": "/images/artworks/akshar_mandala.jpg",
+    "itemSlugs": [
+      "the-architecture-of-solitude",
+      "maun-aur-shabd-srijan-ki-yatra",
+      "devanagari-akshar-mandala",
+      "echoes-of-the-silent-valley",
+      "the-quiet-presence"
+    ]
+  }
+]
