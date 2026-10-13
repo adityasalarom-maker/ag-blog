@@ -279,7 +279,7 @@ async function runPhase6Audit() {
   // -------------------------------------------------------------
   console.log('\n▶ Test Category 5: Security Headers & OWASP Protections');
 
-  const { res: secRes } = await fetchText('/api/search.json');
+  const { res: secRes } = await fetchText('/api/admin/works');
   test('Security Headers - X-Content-Type-Options is nosniff', () => {
     assert.strictEqual(secRes.headers.get('x-content-type-options'), 'nosniff');
   });
