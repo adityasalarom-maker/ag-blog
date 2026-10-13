@@ -13,3 +13,7 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Ephemeral test backups
+data/backups/
+

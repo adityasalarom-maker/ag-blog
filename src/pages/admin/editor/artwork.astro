@@ -1,0 +1,734 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { verifyAdminAuth } from '../../../lib/auth/adminAuth.ts';
+import { getAdminWorkById } from '../../../lib/content/adminService.ts';
+
+export const prerender = false;
+
+// Verify Owner Authentication
+const auth = verifyAdminAuth(Astro.request);
+if (!auth.authorized) {
+  return Astro.redirect('/admin/login');
+}
+
+const editId = Astro.url.searchParams.get('id');
+const existingWork = editId ? getAdminWorkById(editId) : undefined;
+---
+
+<BaseLayout 
+  title={existingWork ? `Editing Artwork: ${existingWork.title} — Antigravity Review` : "New Visual Artwork — Antigravity Review"}
+  description="Editorial curation and technical specification interface for visual arts and crafts."
+>
+  <div class="editor-shell">
+    <header class="editor-header">
+      <div class="header-left">
+        <a href="/admin" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+        <div>
+          <h1 class="editor-title">
+            {existingWork ? `Edit Visual Artwork` : `Curate New Visual Artwork`}
+          </h1>
+          <p class="editor-subtitle">दृश्य कला एवं शिल्प कक्ष • Visual Arts, Digital Compositions & Sculptures</p>
+        </div>
+      </div>
+      <div class="header-status">
+        {existingWork && (
+          <span class={`status-pill pill-${existingWork.status}`}>
+            Current State: {existingWork.status.toUpperCase()}
+          </span>
+        )}
+      </div>
+    </header>
+
+    <form id="artworkForm" class="editor-form" data-edit-id={existingWork?.id || ''}>
+      <div class="form-grid">
+        <!-- Main Artwork Metadata Column -->
+        <div class="main-column">
+          <!-- Artwork Metadata -->
+          <div class="card section-card">
+            <h2 class="card-heading">1. Artwork Identity & Description</h2>
+            
+            <div class="field-row">
+              <div class="field-group flex-2">
+                <label for="title" class="label-req">Artwork Title (कलाकृति शीर्षक)</label>
+                <input 
+                  type="text" 
+                  id="title" 
+                  name="title" 
+                  required 
+                  class="input-main" 
+                  placeholder="e.g., अक्षर-मंडल (The Akshar Mandala)"
+                  value={existingWork?.title || ''}
+                />
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="creator" class="label-req">Artist Attribution</label>
+                <input 
+                  type="text" 
+                  id="creator" 
+                  name="creator" 
+                  required 
+                  class="input-main" 
+                  value={existingWork?.creator || 'A. G. Varma'}
+                />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group flex-1">
+                <label for="slug" class="label-req">URL Slug (स्थायी पता)</label>
+                <div class="slug-input-wrapper">
+                  <span class="slug-prefix">/gallery/</span>
+                  <input 
+                    type="text" 
+                    id="slug" 
+                    name="slug" 
+                    required 
+                    class="input-slug" 
+                    placeholder="akshar-mandala"
+                    value={existingWork?.slug || ''}
+                  />
+                </div>
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="yearCreated" class="label-req">Year Created</label>
+                <input 
+                  type="number" 
+                  id="yearCreated" 
+                  required 
+                  class="input-main" 
+                  min="1800" 
+                  max="2100"
+                  value={existingWork?.artworkDetails?.yearCreated || new Date().getFullYear()}
+                />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="excerpt" class="label-req">Curatorial Summary / Excerpt</label>
+              <textarea 
+                id="excerpt" 
+                rows="2" 
+                required 
+                class="textarea-main" 
+                placeholder="A concise description of the aesthetic focus and emotional resonance..."
+              >{existingWork?.excerpt || ''}</textarea>
+            </div>
+
+            <div class="field-group">
+              <label for="body" class="label-req">Curator's Notes & Artistic Statement</label>
+              <textarea 
+                id="body" 
+                rows="6" 
+                class="textarea-main" 
+                placeholder="Detailed curatorial statement, philosophical inquiry, or technique notes..."
+              >{existingWork?.body || ''}</textarea>
+            </div>
+          </div>
+
+          <!-- Technical Artwork Specifications -->
+          <div class="card section-card">
+            <h2 class="card-heading">2. Medium, Dimensions & Aspect Ratio</h2>
+
+            <div class="field-row">
+              <div class="field-group flex-2">
+                <label for="medium" class="label-req">Artistic Medium (माध्यम)</label>
+                <input 
+                  type="text" 
+                  id="medium" 
+                  required 
+                  class="input-main" 
+                  placeholder="e.g. Gold foil, ink, and digital vector on archival paper"
+                  value={existingWork?.artworkDetails?.medium || ''}
+                />
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="dimensions" class="label-req">Physical / Native Dimensions</label>
+                <input 
+                  type="text" 
+                  id="dimensions" 
+                  required 
+                  class="input-main" 
+                  placeholder="e.g. 4000 × 2250 px or 72 × 96 cm"
+                  value={existingWork?.artworkDetails?.dimensions || ''}
+                />
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="aspectRatio" class="label-req">Aspect Ratio</label>
+                <select id="aspectRatio" class="select-main" required>
+                  <option value="16:9" selected={existingWork?.artworkDetails?.aspectRatio === '16:9'}>16:9 (Landscape)</option>
+                  <option value="1:1" selected={existingWork?.artworkDetails?.aspectRatio === '1:1'}>1:1 (Square)</option>
+                  <option value="3:4" selected={existingWork?.artworkDetails?.aspectRatio === '3:4'}>3:4 (Portrait)</option>
+                  <option value="4:3" selected={existingWork?.artworkDetails?.aspectRatio === '4:3'}>4:3 (Classic Landscape)</option>
+                  <option value="2:3" selected={existingWork?.artworkDetails?.aspectRatio === '2:3'}>2:3 (Tall Portrait)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Asset & Live Preview -->
+          <div class="card section-card">
+            <h2 class="card-heading">3. Visual Asset & Accessible Description</h2>
+
+            <div class="field-group">
+              <label for="coverImage" class="label-req">Artwork Image Path / URL</label>
+              <input 
+                type="text" 
+                id="coverImage" 
+                required 
+                class="input-main" 
+                placeholder="/images/artworks/akshar_mandala.jpg or https://..."
+                value={existingWork?.coverImage || ''}
+              />
+              <span class="field-hint">Local static asset path or hosted media URL.</span>
+            </div>
+
+            <div class="field-group">
+              <label for="coverAlt" class="label-req">Accessible Visual Description (Alt Text)</label>
+              <textarea 
+                id="coverAlt" 
+                rows="2" 
+                required 
+                class="textarea-main" 
+                placeholder="Describe colors, geometric forms, light and textures for visually impaired readers..."
+              >{existingWork?.coverAlt || ''}</textarea>
+            </div>
+
+            <div class="image-preview-container">
+              <span class="preview-title">Live Canvas Preview</span>
+              <div id="imagePreviewBox" class="image-box">
+                <img id="previewImg" src={existingWork?.coverImage || ''} alt="Artwork preview" style={existingWork?.coverImage ? '' : 'display: none;'} />
+                <span id="previewPlaceholder" class="preview-empty" style={existingWork?.coverImage ? 'display: none;' : ''}>
+                  Enter an image URL or path above to see the aspect ratio preview.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="side-column">
+          <!-- Rights & Attribution -->
+          <div class="card side-card">
+            <h3 class="side-heading">Rights & Provenance</h3>
+            
+            <div class="field-group">
+              <label for="declarationType">Declaration Type</label>
+              <select id="declarationType" class="select-main">
+                <option value="Original Creator" selected={existingWork?.rights?.declarationType === 'Original Creator'}>
+                  Original Creator
+                </option>
+                <option value="Public Domain Attributed" selected={existingWork?.rights?.declarationType === 'Public Domain Attributed'}>
+                  Public Domain Attributed
+                </option>
+                <option value="Curated Citation" selected={existingWork?.rights?.declarationType === 'Curated Citation'}>
+                  Curated Citation
+                </option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="rightsStatus">Attribution Status</label>
+              <select id="rightsStatus" class="select-main">
+                <option value="Creator-Declared" selected={existingWork?.rights?.status === 'Creator-Declared'}>
+                  Creator-Declared
+                </option>
+                <option value="Attributed" selected={existingWork?.rights?.status === 'Attributed'}>
+                  Attributed
+                </option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="rightsNotice">Public Rights Notice</label>
+              <input 
+                type="text" 
+                id="rightsNotice" 
+                class="input-main" 
+                value={existingWork?.rights?.notice || `© ${new Date().getFullYear()} A. G. Varma. All rights reserved.`}
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="privateEvidenceRef">Confidential Evidence Ref (Internal)</label>
+              <input 
+                type="text" 
+                id="privateEvidenceRef" 
+                class="input-main" 
+                placeholder="e.g. ART-CERT-2026-03"
+                value={existingWork?.rights?.privateEvidenceRef || ''}
+              />
+              <span class="field-hint">🔒 Never exposed to public website or API.</span>
+            </div>
+          </div>
+
+          <!-- Categorization & Tags -->
+          <div class="card side-card">
+            <h3 class="side-heading">Classification</h3>
+
+            <div class="field-group">
+              <label for="tagsInput">Tags (Comma-separated)</label>
+              <input 
+                type="text" 
+                id="tagsInput" 
+                class="input-main" 
+                placeholder="typography, sacred-geometry, dewanagari"
+                value={(existingWork?.tags || []).join(', ')}
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="internalNotes">Private Curatorial Notes</label>
+              <textarea 
+                id="internalNotes" 
+                rows="3" 
+                class="textarea-main" 
+                placeholder="Private acquisition notes, exhibition details, or buyer information..."
+              >{existingWork?.internalNotes || ''}</textarea>
+              <span class="field-hint">🔒 Stripped from public responses.</span>
+            </div>
+          </div>
+
+          <!-- Publishing Actions -->
+          <div class="card side-card sticky-actions">
+            <h3 class="side-heading">Publishing Controls</h3>
+            <div id="feedbackBox" class="feedback-banner" style="display: none;"></div>
+
+            <div class="action-stack">
+              <button type="button" id="saveDraftBtn" class="btn-ctrl btn-draft">
+                <span>Save as Draft (Quarantined)</span>
+              </button>
+              <button type="button" id="publishBtn" class="btn-ctrl btn-publish-now">
+                <span>Publish to Gallery</span>
+              </button>
+              <button type="button" id="previewBtn" class="btn-ctrl btn-preview">
+                <span>Open Artwork Preview</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .editor-shell {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-12);
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-8);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-back:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold);
+    }
+
+    .editor-title {
+      font-family: var(--font-cinzel);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .editor-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .status-pill {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+    }
+
+    .pill-published { background: rgba(34, 197, 94, 0.15); color: #15803d; }
+    .pill-draft { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+    .pill-archived { background: rgba(100, 116, 139, 0.15); color: #475569; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .main-column, .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: var(--space-5);
+    }
+
+    .card-heading {
+      font-family: var(--font-cinzel);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .side-heading {
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .field-row {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .flex-1 { flex: 1; }
+    .flex-2 { flex: 2; }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin-bottom: var(--space-3);
+    }
+
+    .label-req::after {
+      content: " *";
+      color: #dc2626;
+    }
+
+    label {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .input-main, .select-main, .textarea-main {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-family: var(--font-inter);
+      font-size: 0.95rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .input-main:focus, .select-main:focus, .textarea-main:focus {
+      outline: none;
+      border-color: var(--color-gold);
+    }
+
+    .slug-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .slug-prefix {
+      padding: 0 0.5rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .input-slug {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      background: transparent;
+      color: var(--text-primary);
+      border: none;
+      outline: none;
+    }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .image-preview-container {
+      margin-top: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .preview-title {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .image-box {
+      border: 1px dashed var(--border-subtle);
+      border-radius: 6px;
+      padding: var(--space-2);
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+    }
+
+    .image-box img {
+      max-width: 100%;
+      max-height: 350px;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
+    .preview-empty {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .sticky-actions {
+      position: sticky;
+      top: var(--space-4);
+    }
+
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .btn-ctrl {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-ctrl:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-draft {
+      background: #b45309;
+      color: #fff;
+    }
+    .btn-draft:hover { background: #92400e; }
+
+    .btn-publish-now {
+      background: #15803d;
+      color: #fff;
+    }
+    .btn-publish-now:hover { background: #166534; }
+
+    .btn-preview {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .btn-preview:hover {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    .feedback-banner {
+      padding: 0.6rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: var(--space-3);
+    }
+  </style>
+
+  <script is:inline>
+    const form = document.getElementById('artworkForm');
+    const editId = form.getAttribute('data-edit-id');
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    const coverImageInput = document.getElementById('coverImage');
+    const previewImg = document.getElementById('previewImg');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    const feedbackBox = document.getElementById('feedbackBox');
+
+    // Auto-slugify on title input if new artwork
+    if (!editId) {
+      titleInput.addEventListener('input', () => {
+        const title = titleInput.value;
+        const slug = title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+        slugInput.value = slug;
+      });
+    }
+
+    // Realtime image preview
+    coverImageInput.addEventListener('input', () => {
+      const url = coverImageInput.value.trim();
+      if (url) {
+        previewImg.src = url;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+      } else {
+        previewImg.style.display = 'none';
+        previewPlaceholder.style.display = 'block';
+      }
+    });
+
+    // Submission Handler (Draft vs Publish)
+    async function submitArtwork(targetStatus) {
+      feedbackBox.style.display = 'none';
+
+      const payload = {
+        title: titleInput.value.trim(),
+        slug: slugInput.value.trim().toLowerCase(),
+        contentType: 'artwork',
+        language: 'hi', // artworks are visual, default primary
+        script: 'Deva',
+        creator: document.getElementById('creator').value.trim(),
+        excerpt: document.getElementById('excerpt').value.trim(),
+        body: document.getElementById('body').value.trim(),
+        coverImage: coverImageInput.value.trim(),
+        coverAlt: document.getElementById('coverAlt').value.trim(),
+        status: targetStatus,
+        tags: document.getElementById('tagsInput').value.split(',').map(t => t.trim()).filter(Boolean),
+        artworkDetails: {
+          medium: document.getElementById('medium').value.trim(),
+          yearCreated: parseInt(document.getElementById('yearCreated').value, 10) || new Date().getFullYear(),
+          dimensions: document.getElementById('dimensions').value.trim(),
+          aspectRatio: document.getElementById('aspectRatio').value
+        },
+        rights: {
+          declaredBy: document.getElementById('creator').value.trim(),
+          declarationType: document.getElementById('declarationType').value,
+          status: document.getElementById('rightsStatus').value,
+          notice: document.getElementById('rightsNotice').value.trim(),
+          privateEvidenceRef: document.getElementById('privateEvidenceRef').value.trim() || undefined
+        },
+        internalNotes: document.getElementById('internalNotes').value.trim() || undefined
+      };
+
+      try {
+        const url = editId ? `/api/admin/works/${editId}` : `/api/admin/works`;
+        const method = editId ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          feedbackBox.textContent = `Artwork successfully saved as ${targetStatus.toUpperCase()}!`;
+          feedbackBox.style.background = 'rgba(34, 197, 94, 0.15)';
+          feedbackBox.style.color = '#15803d';
+          feedbackBox.style.display = 'block';
+
+          setTimeout(() => {
+            window.location.href = `/admin/preview/${data.work.slug}`;
+          }, 600);
+        } else {
+          feedbackBox.textContent = data.error || 'Failed to save artwork.';
+          feedbackBox.style.background = 'rgba(220, 38, 38, 0.15)';
+          feedbackBox.style.color = '#b91c1c';
+          feedbackBox.style.display = 'block';
+        }
+      } catch (err) {
+        feedbackBox.textContent = 'Network error: ' + err.message;
+        feedbackBox.style.background = 'rgba(220, 38, 38, 0.15)';
+        feedbackBox.style.color = '#b91c1c';
+        feedbackBox.style.display = 'block';
+      }
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', () => submitArtwork('draft'));
+    document.getElementById('publishBtn').addEventListener('click', () => submitArtwork('published'));
+    document.getElementById('previewBtn').addEventListener('click', () => {
+      const slug = slugInput.value.trim();
+      if (!slug) {
+        alert('Please fill in a slug first to preview.');
+        return;
+      }
+      window.open(`/admin/preview/${slug}`, '_blank');
+    });
+  </script>
+</BaseLayout>

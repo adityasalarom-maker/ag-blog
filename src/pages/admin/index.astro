@@ -1,0 +1,877 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { verifyAdminAuth } from '../../lib/auth/adminAuth.ts';
+import { getAdminWorks } from '../../lib/content/adminService.ts';
+
+export const prerender = false;
+
+// Verify Owner Authentication
+const auth = verifyAdminAuth(Astro.request);
+if (!auth.authorized) {
+  return Astro.redirect('/admin/login');
+}
+
+const allWorks = getAdminWorks();
+
+const stats = {
+  total: allWorks.length,
+  published: allWorks.filter(w => w.status === 'published').length,
+  drafts: allWorks.filter(w => w.status === 'draft').length,
+  archived: allWorks.filter(w => w.status === 'archived').length
+};
+---
+
+<BaseLayout 
+  title="Owner Publishing Dashboard — Antigravity Review"
+  description="Editorial management and publishing workflow for Antigravity Review."
+>
+  <div class="admin-shell">
+    <!-- Top Administrative Navigation -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <span class="brand-crest">AR</span>
+        <div>
+          <h1 class="topbar-title">Editorial Publishing Suite</h1>
+          <p class="topbar-sub">संपादकीय एवं प्रकाशन व्यवस्था • Owner: A. G. Varma</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <a href="/" target="_blank" class="topbar-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+          </svg>
+          <span>View Public Site</span>
+        </a>
+        <button id="logoutBtn" class="topbar-btn-logout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <!-- Metric Counters -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">Total Works</span>
+          <span class="metric-value">{stats.total}</span>
+          <span class="metric-hint">Poetry, prose, thoughts & art</span>
+        </div>
+        <div class="metric-card metric-published">
+          <span class="metric-label">Published (Live)</span>
+          <span class="metric-value">{stats.published}</span>
+          <span class="metric-hint">Publicly indexed & visible</span>
+        </div>
+        <div class="metric-card metric-drafts">
+          <span class="metric-label">Drafts (Quarantined)</span>
+          <span class="metric-value">{stats.drafts}</span>
+          <span class="metric-hint">Strictly hidden from public</span>
+        </div>
+        <div class="metric-card metric-archived">
+          <span class="metric-label">Archived / Withdrawn</span>
+          <span class="metric-value">{stats.archived}</span>
+          <span class="metric-hint">Preserved internally</span>
+        </div>
+      </section>
+
+      <!-- Action & Creation Bar -->
+      <section class="creation-bar">
+        <div class="creation-buttons">
+          <a href="/admin/editor/writing" class="btn-action btn-writing">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <span>+ New Literary Work</span>
+          </a>
+          <a href="/admin/editor/artwork" class="btn-action btn-artwork">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>+ New Visual Artwork</span>
+          </a>
+        </div>
+        <div class="secondary-actions">
+          <button id="exportArchiveBtn" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span>Export Backup Archive</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Content Search & Filter Toolbar -->
+      <section class="filter-toolbar">
+        <div class="status-filters" id="statusFilterGroup">
+          <button class="status-pill active" data-status="all">All ({stats.total})</button>
+          <button class="status-pill" data-status="published">Published ({stats.published})</button>
+          <button class="status-pill pill-amber" data-status="draft">Drafts ({stats.drafts})</button>
+          <button class="status-pill pill-slate" data-status="archived">Archived ({stats.archived})</button>
+        </div>
+
+        <div class="search-filters">
+          <select id="typeFilter" class="select-field">
+            <option value="all">All Content Types</option>
+            <option value="poem">Poetry (कविता)</option>
+            <option value="story">Stories (कहानियाँ)</option>
+            <option value="essay">Essays (निबंध)</option>
+            <option value="thought">Thoughts (विचार)</option>
+            <option value="quote">Quotations (उद्धरण)</option>
+            <option value="artwork">Visual Arts (दृश्य कला)</option>
+          </select>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by title, creator, or slug..." 
+            class="search-input"
+          />
+        </div>
+      </section>
+
+      <!-- Works Table -->
+      <section class="table-container">
+        <table class="admin-table" id="worksTable">
+          <thead>
+            <tr>
+              <th>Title & Attribution</th>
+              <th>Type</th>
+              <th>Language</th>
+              <th>Status</th>
+              <th>Rights Declaration</th>
+              <th>Last Updated</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allWorks.map(work => {
+              const editUrl = work.contentType === 'artwork' 
+                ? `/admin/editor/artwork?id=${work.id}` 
+                : `/admin/editor/writing?id=${work.id}`;
+              const previewUrl = `/admin/preview/${work.slug}`;
+              const publicSection = work.contentType === 'artwork' ? 'gallery' : (work.contentType === 'story' || work.contentType === 'essay' ? 'prose' : (work.contentType === 'poem' ? 'poetry' : 'thoughts'));
+              const publicPath = `/${publicSection}/${work.slug}`;
+
+              return (
+                <tr 
+                  data-id={work.id}
+                  data-status={work.status}
+                  data-type={work.contentType}
+                  data-slug={work.slug}
+                  data-public-path={publicPath}
+                  class="work-row"
+                >
+                  <td class="col-title">
+                    <div class="title-meta">
+                      <a href={editUrl} class="work-title-link">
+                        {work.title}
+                      </a>
+                      <span class="work-slug">/{work.slug}</span>
+                      <span class="work-creator">By {work.creator}</span>
+                      {work.internalNotes && (
+                        <span class="internal-notes-tag" title={work.internalNotes}>
+                          🔒 Private Note
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <span class={`type-chip type-${work.contentType}`}>
+                      {work.contentType}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="lang-tag">
+                      {work.language.toUpperCase()}-{work.script}
+                    </span>
+                  </td>
+                  <td>
+                    <span class={`status-badge status-${work.status}`}>
+                      {work.status === 'published' ? '● Published' : (work.status === 'draft' ? '◌ Draft' : '○ Archived')}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="rights-info">
+                      <span class="rights-status">{work.rights.status}</span>
+                      <span class="rights-type">{work.rights.declarationType}</span>
+                    </div>
+                  </td>
+                  <td class="col-date">
+                    {new Date(work.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
+                  <td class="col-actions">
+                    <div class="action-btn-group">
+                      <a href={previewUrl} class="btn-icon" title="Preview Draft / Reading Canvas" target="_blank">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </a>
+                      <a href={editUrl} class="btn-icon" title="Edit Content">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                      </a>
+                      {work.status !== 'published' ? (
+                        <button class="btn-action-sm btn-publish" data-action="publish" title="Publish to public website">
+                          Publish
+                        </button>
+                      ) : (
+                        <button class="btn-action-sm btn-archive" data-action="archive" title="Withdraw from public website">
+                          Archive
+                        </button>
+                      )}
+                      {work.status === 'published' && (
+                        <button class="btn-icon btn-share" data-action="share" title="Copy public canonical link">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                          </svg>
+                        </button>
+                      )}
+                      <button class="btn-icon btn-delete" data-action="delete" title="Delete work permanently">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <style>
+    .admin-shell {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-12);
+    }
+
+    .admin-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-8);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .brand-crest {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--color-gold);
+      color: #fff;
+      font-family: var(--font-cinzel);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .topbar-title {
+      font-family: var(--font-cinzel);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .topbar-sub {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .topbar-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      text-decoration: none;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .topbar-link:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold);
+    }
+
+    .topbar-btn-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      color: #b91c1c;
+      background: rgba(185, 28, 28, 0.05);
+      border: 1px solid rgba(185, 28, 28, 0.2);
+      padding: 0.5rem 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .topbar-btn-logout:hover {
+      background: rgba(185, 28, 28, 0.12);
+    }
+
+    /* Metric Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metric-label {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-family: var(--font-cinzel);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .metric-hint {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .metric-published .metric-value { color: #15803d; }
+    .metric-drafts .metric-value { color: #b45309; }
+    .metric-archived .metric-value { color: #64748b; }
+
+    /* Creation Bar */
+    .creation-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .creation-buttons {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.75rem 1.25rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .btn-writing {
+      background: var(--color-gold);
+      color: #fff;
+    }
+
+    .btn-writing:hover {
+      background: #966f07;
+      transform: translateY(-1px);
+    }
+
+    .btn-artwork {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+    }
+
+    .btn-artwork:hover {
+      background: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 0.65rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold);
+    }
+
+    /* Filters & Search */
+    .filter-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .status-filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .status-pill.active {
+      background: var(--color-gold);
+      color: #fff;
+      border-color: var(--color-gold);
+    }
+
+    .search-filters {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-grow: 1;
+      max-width: 500px;
+    }
+
+    .select-field {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    .search-input {
+      flex-grow: 1;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    /* Works Table */
+    .table-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      overflow-x: auto;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .admin-table th {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .admin-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover {
+      background: rgba(184, 134, 11, 0.03);
+    }
+
+    .col-title {
+      max-width: 320px;
+    }
+
+    .title-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .work-title-link {
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .work-title-link:hover {
+      color: var(--color-gold);
+    }
+
+    .work-slug {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .work-creator {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .internal-notes-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      color: #92400e;
+      background: #fef3c7;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      width: fit-content;
+      margin-top: 2px;
+    }
+
+    .type-chip {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-family: var(--font-cinzel);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      background: var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .type-poem { background: rgba(59, 130, 246, 0.1); color: #1d4ed8; }
+    .type-artwork { background: rgba(168, 85, 247, 0.1); color: #7e22ce; }
+    .type-story, .type-essay { background: rgba(16, 185, 129, 0.1); color: #047857; }
+    .type-thought, .type-quote { background: rgba(245, 158, 11, 0.1); color: #b45309; }
+
+    .lang-tag {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .status-published {
+      background: rgba(34, 197, 94, 0.1);
+      color: #15803d;
+    }
+
+    .status-draft {
+      background: rgba(245, 158, 11, 0.1);
+      color: #b45309;
+    }
+
+    .status-archived {
+      background: rgba(100, 116, 139, 0.1);
+      color: #475569;
+    }
+
+    .rights-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.75rem;
+    }
+
+    .rights-status {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .rights-type {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+
+    .col-date {
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-size: 0.8rem;
+    }
+
+    .col-actions {
+      white-space: nowrap;
+    }
+
+    .action-btn-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.35rem;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      cursor: pointer;
+      text-decoration: none;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-icon:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold);
+    }
+
+    .btn-action-sm {
+      font-family: var(--font-cinzel);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 0.3rem 0.65rem;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .btn-publish {
+      background: #15803d;
+      color: #fff;
+    }
+
+    .btn-publish:hover { background: #166534; }
+
+    .btn-archive {
+      background: #64748b;
+      color: #fff;
+    }
+
+    .btn-archive:hover { background: #475569; }
+
+    .btn-delete:hover {
+      color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    .text-right { text-align: right; }
+  </style>
+
+  <script is:inline>
+    // Logout Handler
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        await fetch('/api/admin/auth/logout', { method: 'POST' });
+        localStorage.removeItem('ag_admin_token');
+        window.location.href = '/admin/login';
+      });
+    }
+
+    // Export Backup Handler
+    const exportBtn = document.getElementById('exportArchiveBtn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/api/admin/backup/export');
+          const data = await res.json();
+          if (data.success) {
+            const blob = new Blob([JSON.stringify(data.backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `antigravity_content_backup_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+        } catch (err) {
+          alert('Export failed: ' + err.message);
+        }
+      });
+    }
+
+    // Filtering & Search
+    const statusPills = document.querySelectorAll('.status-pill');
+    const typeSelect = document.getElementById('typeFilter');
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('.work-row');
+
+    let currentStatus = 'all';
+
+    function applyFilters() {
+      const selectedType = typeSelect.value;
+      const query = (searchInput.value || '').trim().toLowerCase();
+
+      rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const rowType = row.getAttribute('data-type');
+        const text = row.textContent.toLowerCase();
+
+        const matchStatus = currentStatus === 'all' || rowStatus === currentStatus;
+        const matchType = selectedType === 'all' || rowType === selectedType;
+        const matchQuery = !query || text.includes(query);
+
+        if (matchStatus && matchType && matchQuery) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    statusPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        statusPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentStatus = pill.getAttribute('data-status');
+        applyFilters();
+      });
+    });
+
+    if (typeSelect) typeSelect.addEventListener('change', applyFilters);
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+    // Row Actions: Publish, Archive, Delete, Copy Share Link
+    document.getElementById('worksTable').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      const action = btn.getAttribute('data-action');
+      const row = btn.closest('tr');
+      const id = row.getAttribute('data-id');
+      const title = row.querySelector('.work-title-link').textContent.trim();
+
+      if (action === 'publish') {
+        if (!confirm(`Publish "${title}" to the public journal?`)) return;
+        btn.disabled = true;
+        btn.textContent = 'Publishing...';
+        const res = await fetch(`/api/admin/works/${id}/publish`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.error || 'Failed to publish.');
+          btn.disabled = false;
+          btn.textContent = 'Publish';
+        }
+      }
+
+      if (action === 'archive') {
+        if (!confirm(`Withdraw "${title}" from the public journal? (It will be archived and quarantined)`)) return;
+        btn.disabled = true;
+        btn.textContent = 'Archiving...';
+        const res = await fetch(`/api/admin/works/${id}/archive`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.error || 'Failed to archive.');
+          btn.disabled = false;
+          btn.textContent = 'Archive';
+        }
+      }
+
+      if (action === 'delete') {
+        if (!confirm(`Are you certain you wish to PERMANENTLY delete "${title}"? This cannot be undone.`)) return;
+        const res = await fetch(`/api/admin/works/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          row.remove();
+        } else {
+          alert(data.error || 'Failed to delete.');
+        }
+      }
+
+      if (action === 'share') {
+        const publicPath = row.getAttribute('data-public-path');
+        const canonicalUrl = `${window.location.origin}${publicPath}`;
+        navigator.clipboard.writeText(canonicalUrl).then(() => {
+          alert(`Canonical link copied to clipboard:\n${canonicalUrl}`);
+        });
+      }
+    });
+  </script>
+</BaseLayout>

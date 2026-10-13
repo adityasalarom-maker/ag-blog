@@ -1,0 +1,839 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { verifyAdminAuth } from '../../../lib/auth/adminAuth.ts';
+import { getAdminWorkById, getAdminWorks } from '../../../lib/content/adminService.ts';
+
+export const prerender = false;
+
+// Verify Owner Authentication
+const auth = verifyAdminAuth(Astro.request);
+if (!auth.authorized) {
+  return Astro.redirect('/admin/login');
+}
+
+const editId = Astro.url.searchParams.get('id');
+const existingWork = editId ? getAdminWorkById(editId) : undefined;
+const allWorks = getAdminWorks();
+// Potential companion translations: other literary works
+const potentialCompanions = allWorks.filter(w => w.id !== editId && w.contentType !== 'artwork');
+---
+
+<BaseLayout 
+  title={existingWork ? `Editing: ${existingWork.title} — Antigravity Review` : "New Literary Work — Antigravity Review"}
+  description="Editorial writing interface for poetry, stories, essays, and contemplative thoughts."
+>
+  <div class="editor-shell">
+    <header class="editor-header">
+      <div class="header-left">
+        <a href="/admin" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+        <div>
+          <h1 class="editor-title">
+            {existingWork ? `Edit Literary Work` : `Compose New Literary Work`}
+          </h1>
+          <p class="editor-subtitle">साहित्यिक रचना कक्ष • Poetry, Prose, Essays & Thoughts</p>
+        </div>
+      </div>
+      <div class="header-status">
+        {existingWork && (
+          <span class={`status-pill pill-${existingWork.status}`}>
+            Current State: {existingWork.status.toUpperCase()}
+          </span>
+        )}
+      </div>
+    </header>
+
+    <form id="writingForm" class="editor-form" data-edit-id={existingWork?.id || ''}>
+      <div class="form-grid">
+        <!-- Main Composition Column -->
+        <div class="main-column">
+          <div class="card section-card">
+            <h2 class="card-heading">1. Essential Literary Metadata</h2>
+            
+            <div class="field-row">
+              <div class="field-group flex-2">
+                <label for="title" class="label-req">Work Title (शीर्षक)</label>
+                <input 
+                  type="text" 
+                  id="title" 
+                  name="title" 
+                  required 
+                  class="input-main" 
+                  placeholder="e.g., समय की नदी or The River of Time"
+                  value={existingWork?.title || ''}
+                />
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="contentType" class="label-req">Content Form</label>
+                <select id="contentType" name="contentType" class="select-main" required>
+                  <option value="poem" selected={existingWork?.contentType === 'poem'}>Poetry (कविता)</option>
+                  <option value="story" selected={existingWork?.contentType === 'story'}>Short Story (कहानी)</option>
+                  <option value="essay" selected={existingWork?.contentType === 'essay'}>Literary Essay (निबंध)</option>
+                  <option value="thought" selected={existingWork?.contentType === 'thought'}>Contemplative Thought (विचार)</option>
+                  <option value="quote" selected={existingWork?.contentType === 'quote'}>Classical Quotation (उद्धरण)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group flex-1">
+                <label for="slug" class="label-req">URL Slug (स्थायी पता)</label>
+                <div class="slug-input-wrapper">
+                  <span class="slug-prefix">/poetry/</span>
+                  <input 
+                    type="text" 
+                    id="slug" 
+                    name="slug" 
+                    required 
+                    class="input-slug" 
+                    placeholder="smritiyon-ki-dehari-par"
+                    value={existingWork?.slug || ''}
+                  />
+                </div>
+              </div>
+
+              <div class="field-group flex-1">
+                <label for="creator" class="label-req">Creator Attribution</label>
+                <input 
+                  type="text" 
+                  id="creator" 
+                  name="creator" 
+                  required 
+                  class="input-main" 
+                  value={existingWork?.creator || 'A. G. Varma'}
+                />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="excerpt" class="label-req">Excerpt / Epigraph (संक्षिप्त परिचय)</label>
+              <textarea 
+                id="excerpt" 
+                name="excerpt" 
+                rows="2" 
+                required 
+                class="textarea-main" 
+                placeholder="A contemplative summary or resonant stanza opening the piece..."
+              >{existingWork?.excerpt || ''}</textarea>
+            </div>
+          </div>
+
+          <!-- Body Composition & Live Whitespace Preview -->
+          <div class="card section-card">
+            <div class="body-header">
+              <h2 class="card-heading">2. Literary Text & Stanza Rhythm</h2>
+              <span class="body-hint">Authorial line breaks and spacing are strictly preserved in poetry mode.</span>
+            </div>
+
+            <div class="editor-split">
+              <div class="field-group">
+                <label for="bodyText" class="label-req">Source Text</label>
+                <textarea 
+                  id="bodyText" 
+                  name="body" 
+                  rows="16" 
+                  class="textarea-code" 
+                  placeholder="Compose or paste your poem / essay stanzas here..."
+                >{existingWork?.body || ''}</textarea>
+              </div>
+
+              <div class="preview-panel">
+                <span class="preview-label">Live Whitespace Preview (पाठ पूर्वावलोकन)</span>
+                <div id="livePreview" class="canvas-preview">
+                  <!-- Realtime preview injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bibliographic Quote Source (Shown if Quote) -->
+          <div class="card section-card" id="quoteFieldsCard" style={existingWork?.contentType === 'quote' ? '' : 'display: none;'}>
+            <h2 class="card-heading">3. Historical & Bibliographic Citation</h2>
+            <div class="field-row">
+              <div class="field-group flex-1">
+                <label for="quoteAuthor">Quotation Author</label>
+                <input 
+                  type="text" 
+                  id="quoteAuthor" 
+                  class="input-main" 
+                  placeholder="e.g. Kabir, Jaishankar Prasad, Rilke"
+                  value={existingWork?.quoteSource?.author || ''}
+                />
+              </div>
+              <div class="field-group flex-1">
+                <label for="quoteWork">Source Work Title</label>
+                <input 
+                  type="text" 
+                  id="quoteWork" 
+                  class="input-main" 
+                  placeholder="e.g. Kamayani, Letters to a Young Poet"
+                  value={existingWork?.quoteSource?.workTitle || ''}
+                />
+              </div>
+              <div class="field-group" style="width: 120px;">
+                <label for="quoteYear">Year / Era</label>
+                <input 
+                  type="text" 
+                  id="quoteYear" 
+                  class="input-main" 
+                  placeholder="e.g. 1936"
+                  value={existingWork?.quoteSource?.year || ''}
+                />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group flex-2">
+                <label for="quoteUrl">Citation Reference URL</label>
+                <input 
+                  type="url" 
+                  id="quoteUrl" 
+                  class="input-main" 
+                  placeholder="https://..."
+                  value={existingWork?.quoteSource?.url || ''}
+                />
+              </div>
+              <div class="field-group flex-1" style="justify-content: flex-end; padding-bottom: 0.5rem;">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    id="quoteVerified" 
+                    checked={existingWork?.quoteSource?.isVerified ?? false}
+                  />
+                  <span>Bibliographically Verified</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Options Column -->
+        <div class="side-column">
+          <!-- Language & Script -->
+          <div class="card side-card">
+            <h3 class="side-heading">Language & Script</h3>
+            <div class="field-group">
+              <label for="language">Primary Language</label>
+              <select id="language" name="language" class="select-main">
+                <option value="hi" selected={existingWork?.language === 'hi'}>Hindi (हिन्दी)</option>
+                <option value="en" selected={existingWork?.language === 'en'}>English</option>
+                <option value="mixed" selected={existingWork?.language === 'mixed'}>Bilingual / Mixed</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="script">Orthographic Script</label>
+              <select id="script" name="script" class="select-main">
+                <option value="Deva" selected={existingWork?.script === 'Deva'}>Devanagari (देवनागरी)</option>
+                <option value="Latn" selected={existingWork?.script === 'Latn'}>Latin</option>
+                <option value="mixed" selected={existingWork?.script === 'mixed'}>Mixed</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="companionWork">Bilingual Companion Edition</label>
+              <select id="companionWork" class="select-main">
+                <option value="">None (Independent Work)</option>
+                {potentialCompanions.map(c => (
+                  <option 
+                    value={c.slug} 
+                    data-title={c.title}
+                    data-lang={c.language}
+                    selected={existingWork?.translatedEditionSlug === c.slug}
+                  >
+                    {c.title} ({c.language.toUpperCase()})
+                  </option>
+                ))}
+              </select>
+              <span class="field-hint">Reciprocal bidirectional link between Hindi and English versions.</span>
+            </div>
+          </div>
+
+          <!-- Rights & Provenance -->
+          <div class="card side-card">
+            <h3 class="side-heading">Rights & Provenance</h3>
+            
+            <div class="field-group">
+              <label for="declarationType">Declaration Type</label>
+              <select id="declarationType" class="select-main">
+                <option value="Original Creator" selected={existingWork?.rights?.declarationType === 'Original Creator'}>
+                  Original Creator
+                </option>
+                <option value="Public Domain Attributed" selected={existingWork?.rights?.declarationType === 'Public Domain Attributed'}>
+                  Public Domain Attributed
+                </option>
+                <option value="Curated Citation" selected={existingWork?.rights?.declarationType === 'Curated Citation'}>
+                  Curated Citation
+                </option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="rightsStatus">Attribution Status</label>
+              <select id="rightsStatus" class="select-main">
+                <option value="Creator-Declared" selected={existingWork?.rights?.status === 'Creator-Declared'}>
+                  Creator-Declared
+                </option>
+                <option value="Attributed" selected={existingWork?.rights?.status === 'Attributed'}>
+                  Attributed
+                </option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="rightsNotice">Public Rights Notice</label>
+              <input 
+                type="text" 
+                id="rightsNotice" 
+                class="input-main" 
+                value={existingWork?.rights?.notice || `© ${new Date().getFullYear()} A. G. Varma. All rights reserved.`}
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="privateEvidenceRef">Confidential Evidence Ref (Internal)</label>
+              <input 
+                type="text" 
+                id="privateEvidenceRef" 
+                class="input-main" 
+                placeholder="e.g. REG-2026-POEM-01"
+                value={existingWork?.rights?.privateEvidenceRef || ''}
+              />
+              <span class="field-hint">🔒 Never exposed to public website or API.</span>
+            </div>
+          </div>
+
+          <!-- Taxonomy & Reading Time -->
+          <div class="card side-card">
+            <h3 class="side-heading">Taxonomy & Meta</h3>
+
+            <div class="field-group">
+              <label for="tagsInput">Tags (Comma-separated)</label>
+              <input 
+                type="text" 
+                id="tagsInput" 
+                class="input-main" 
+                placeholder="smriti, monsoon, kavita"
+                value={(existingWork?.tags || []).join(', ')}
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="readingTime">Estimated Reading Time (Min)</label>
+              <input 
+                type="number" 
+                id="readingTime" 
+                class="input-main" 
+                min="1" 
+                max="120"
+                value={existingWork?.readingTimeMinutes || 3}
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="internalNotes">Private Editorial Notes</label>
+              <textarea 
+                id="internalNotes" 
+                rows="3" 
+                class="textarea-main" 
+                placeholder="Internal notes regarding revisions, dates, or correspondence..."
+              >{existingWork?.internalNotes || ''}</textarea>
+              <span class="field-hint">🔒 Stripped from all public responses.</span>
+            </div>
+          </div>
+
+          <!-- Action Submission Card -->
+          <div class="card side-card sticky-actions">
+            <h3 class="side-heading">Publishing Controls</h3>
+            <div id="feedbackBox" class="feedback-banner" style="display: none;"></div>
+
+            <div class="action-stack">
+              <button type="button" id="saveDraftBtn" class="btn-ctrl btn-draft">
+                <span>Save as Draft (Quarantined)</span>
+              </button>
+              <button type="button" id="publishBtn" class="btn-ctrl btn-publish-now">
+                <span>Publish Immediately</span>
+              </button>
+              <button type="button" id="previewBtn" class="btn-ctrl btn-preview">
+                <span>Open Reading Preview</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .editor-shell {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-12);
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-8);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-back:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold);
+    }
+
+    .editor-title {
+      font-family: var(--font-cinzel);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .editor-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .status-pill {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+    }
+
+    .pill-published { background: rgba(34, 197, 94, 0.15); color: #15803d; }
+    .pill-draft { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+    .pill-archived { background: rgba(100, 116, 139, 0.15); color: #475569; }
+
+    /* Form Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-6);
+    }
+
+    @media (max-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .main-column, .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: var(--space-5);
+    }
+
+    .card-heading {
+      font-family: var(--font-cinzel);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .side-heading {
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .field-row {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .flex-1 { flex: 1; }
+    .flex-2 { flex: 2; }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin-bottom: var(--space-3);
+    }
+
+    .label-req::after {
+      content: " *";
+      color: #dc2626;
+    }
+
+    label {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .input-main, .select-main, .textarea-main {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-family: var(--font-inter);
+      font-size: 0.95rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .input-main:focus, .select-main:focus, .textarea-main:focus {
+      outline: none;
+      border-color: var(--color-gold);
+    }
+
+    .slug-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .slug-prefix {
+      padding: 0 0.5rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .input-slug {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      background: transparent;
+      color: var(--text-primary);
+      border: none;
+      outline: none;
+    }
+
+    .body-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-3);
+    }
+
+    .body-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .editor-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 768px) {
+      .editor-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .textarea-code {
+      width: 100%;
+      height: 400px;
+      padding: 1rem;
+      font-family: var(--font-noto-serif-devanagari), Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.8;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .preview-label {
+      font-family: var(--font-cinzel);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .canvas-preview {
+      height: 400px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border: 1px dashed var(--color-gold);
+      border-radius: 4px;
+      font-family: var(--font-noto-serif-devanagari), Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: var(--text-primary);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-transform: none;
+    }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Action Buttons */
+    .sticky-actions {
+      position: sticky;
+      top: var(--space-4);
+    }
+
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .btn-ctrl {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1rem;
+      font-family: var(--font-cinzel);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-ctrl:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-draft {
+      background: #b45309;
+      color: #fff;
+    }
+    .btn-draft:hover { background: #92400e; }
+
+    .btn-publish-now {
+      background: #15803d;
+      color: #fff;
+    }
+    .btn-publish-now:hover { background: #166534; }
+
+    .btn-preview {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .btn-preview:hover {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    .feedback-banner {
+      padding: 0.6rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: var(--space-3);
+    }
+  </style>
+
+  <script is:inline>
+    const form = document.getElementById('writingForm');
+    const editId = form.getAttribute('data-edit-id');
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    const contentTypeSelect = document.getElementById('contentType');
+    const bodyText = document.getElementById('bodyText');
+    const livePreview = document.getElementById('livePreview');
+    const quoteFieldsCard = document.getElementById('quoteFieldsCard');
+    const feedbackBox = document.getElementById('feedbackBox');
+
+    // Auto-slugify on title input if new work
+    if (!editId) {
+      titleInput.addEventListener('input', () => {
+        const title = titleInput.value;
+        const slug = title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+        slugInput.value = slug;
+      });
+    }
+
+    // Toggle Quote citation fields if contentType === 'quote'
+    contentTypeSelect.addEventListener('change', () => {
+      if (contentTypeSelect.value === 'quote') {
+        quoteFieldsCard.style.display = 'block';
+      } else {
+        quoteFieldsCard.style.display = 'none';
+      }
+    });
+
+    // Realtime Whitespace Preview
+    function updatePreview() {
+      livePreview.textContent = bodyText.value || 'Preview will render here with preserved whitespace and stanza line-height...';
+    }
+    bodyText.addEventListener('input', updatePreview);
+    updatePreview();
+
+    // Submission Handler (Draft vs Publish)
+    async function submitWork(targetStatus) {
+      feedbackBox.style.display = 'none';
+
+      const companionSelect = document.getElementById('companionWork');
+      const selectedOption = companionSelect.options[companionSelect.selectedIndex];
+      const companionSlug = companionSelect.value || undefined;
+      const companionTitle = companionSlug ? selectedOption.getAttribute('data-title') : undefined;
+      const companionLang = companionSlug ? selectedOption.getAttribute('data-lang') : undefined;
+
+      const payload = {
+        title: titleInput.value.trim(),
+        slug: slugInput.value.trim().toLowerCase(),
+        contentType: contentTypeSelect.value,
+        language: document.getElementById('language').value,
+        script: document.getElementById('script').value,
+        creator: document.getElementById('creator').value.trim(),
+        excerpt: document.getElementById('excerpt').value.trim(),
+        body: bodyText.value,
+        status: targetStatus,
+        readingTimeMinutes: parseInt(document.getElementById('readingTime').value, 10) || 3,
+        tags: document.getElementById('tagsInput').value.split(',').map(t => t.trim()).filter(Boolean),
+        translatedEditionSlug: companionSlug,
+        translatedEditionTitle: companionTitle,
+        translatedEditionLang: companionLang,
+        rights: {
+          declaredBy: document.getElementById('creator').value.trim(),
+          declarationType: document.getElementById('declarationType').value,
+          status: document.getElementById('rightsStatus').value,
+          notice: document.getElementById('rightsNotice').value.trim(),
+          privateEvidenceRef: document.getElementById('privateEvidenceRef').value.trim() || undefined
+        },
+        internalNotes: document.getElementById('internalNotes').value.trim() || undefined
+      };
+
+      if (contentTypeSelect.value === 'quote') {
+        payload.quoteSource = {
+          author: document.getElementById('quoteAuthor').value.trim(),
+          workTitle: document.getElementById('quoteWork').value.trim(),
+          year: document.getElementById('quoteYear').value.trim() || undefined,
+          url: document.getElementById('quoteUrl').value.trim() || undefined,
+          isVerified: document.getElementById('quoteVerified').checked
+        };
+      }
+
+      try {
+        const url = editId ? `/api/admin/works/${editId}` : `/api/admin/works`;
+        const method = editId ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          feedbackBox.textContent = `Work successfully saved as ${targetStatus.toUpperCase()}!`;
+          feedbackBox.style.background = 'rgba(34, 197, 94, 0.15)';
+          feedbackBox.style.color = '#15803d';
+          feedbackBox.style.display = 'block';
+
+          setTimeout(() => {
+            window.location.href = `/admin/preview/${data.work.slug}`;
+          }, 600);
+        } else {
+          feedbackBox.textContent = data.error || 'Failed to save work.';
+          feedbackBox.style.background = 'rgba(220, 38, 38, 0.15)';
+          feedbackBox.style.color = '#b91c1c';
+          feedbackBox.style.display = 'block';
+        }
+      } catch (err) {
+        feedbackBox.textContent = 'Network error: ' + err.message;
+        feedbackBox.style.background = 'rgba(220, 38, 38, 0.15)';
+        feedbackBox.style.color = '#b91c1c';
+        feedbackBox.style.display = 'block';
+      }
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', () => submitWork('draft'));
+    document.getElementById('publishBtn').addEventListener('click', () => submitWork('published'));
+    document.getElementById('previewBtn').addEventListener('click', () => {
+      const slug = slugInput.value.trim();
+      if (!slug) {
+        alert('Please fill in a slug first to preview.');
+        return;
+      }
+      window.open(`/admin/preview/${slug}`, '_blank');
+    });
+  </script>
+</BaseLayout>
