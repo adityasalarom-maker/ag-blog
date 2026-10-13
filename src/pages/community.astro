@@ -1,0 +1,758 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getBreadcrumbSchema } from '../lib/seo/schema.ts';
+
+const breadcrumbs = getBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Community & Collaboration', url: '/community' }
+]);
+---
+
+<BaseLayout 
+  title="Community & Creative Participation (समुदाय व रचनात्मक सहभागिता) — Antigravity Review"
+  description="Apply to publish creative literary works or propose artistic collaborations with creator A. G. Varma on Antigravity Review."
+  schema={breadcrumbs}
+>
+  <div class="container community-page-container">
+    <header class="page-header">
+      <span class="badge badge-prose">Community & Dialogue • समुदाय व सहभागिता</span>
+      <h1 class="page-title">Creative Participation & Community</h1>
+      <p class="page-subtitle">
+        *Antigravity Review* welcomes thoughtful writers, poets, and visual artists. We invite prospective contributors and collaborators to apply for two distinct pathways of engagement.
+      </p>
+    </header>
+
+    <!-- Two Participation Options Grid -->
+    <section class="options-grid" aria-label="Participation Pathways">
+      <article class="option-card">
+        <div class="option-badge">Pathway 01</div>
+        <h2 class="option-title">Apply to Publish Creative Work</h2>
+        <p class="option-desc">
+          For poets, essayists, fiction writers, and visual artists seeking publication in the journal.
+        </p>
+        <ul class="option-points">
+          <li>✦ Original poetry (Hindi Devanagari or English verse).</li>
+          <li>✦ Literary short fiction, meditative essays, and philosophy.</li>
+          <li>✦ Archival visual art, calligraphy mandalas, and crafts.</li>
+          <li>✦ Rigorous editorial review and creator-declared copyright.</li>
+        </ul>
+        <span class="option-note">
+          *Note: Registration and application do not guarantee publication. All submissions undergo editorial review before public release.*
+        </span>
+      </article>
+
+      <article class="option-card">
+        <div class="option-badge">Pathway 02</div>
+        <h2 class="option-title">Apply to Collaborate with the Author</h2>
+        <p class="option-desc">
+          For creators, researchers, and translators interested in joint literary, artistic, or research ventures.
+        </p>
+        <ul class="option-points">
+          <li>✦ Bilingual literary translation (Hindi ⇄ English).</li>
+          <li>✦ Mixed-media visual and literary companion projects.</li>
+          <li>✦ Editorial, archival, and philosophical research.</li>
+          <li>✦ Thematic anthology co-curation.</li>
+        </ul>
+        <span class="option-note">
+          *Note: Collaborative proposals are reviewed directly by creator A. G. Varma.*
+        </span>
+      </article>
+    </section>
+
+    <!-- Interactive Community Portal: Tabs for Auth, Application & Contributor Portal -->
+    <section class="community-portal-section" id="community-portal">
+      <div class="portal-card">
+        <!-- Auth State Header -->
+        <div class="portal-header">
+          <div class="user-status-display" id="user-status-display">
+            <span class="status-indicator">✦</span>
+            <span id="user-status-text">Guest Reader (Unauthenticated)</span>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="logout-btn" style="display: none;">Sign Out</button>
+        </div>
+
+        <!-- Dynamic Portal Views -->
+        <!-- View 1: Unauthenticated (Tabs: Register / Sign In) -->
+        <div id="unauth-view">
+          <div class="portal-tabs" role="tablist">
+            <button type="button" class="tab-btn active" id="tab-register" role="tab" aria-selected="true" aria-controls="panel-register">
+              Create Community Account
+            </button>
+            <button type="button" class="tab-btn" id="tab-login" role="tab" aria-selected="false" aria-controls="panel-login">
+              Sign In to Existing Account
+            </button>
+          </div>
+
+          <!-- Register Panel -->
+          <div class="tab-panel active" id="panel-register" role="tabpanel" aria-labelledby="tab-register">
+            <p class="panel-desc">
+              Register as a community member to submit publishing proposals, participate in discussions, or track your collaborative applications.
+            </p>
+            <form id="register-form" novalidate>
+              <div style="display: none;" aria-hidden="true">
+                <input type="text" name="honeypot" id="reg-honeypot" tabindex="-1" autocomplete="off" />
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="reg-name" class="form-label">Full Name <span class="required">*</span></label>
+                  <input type="text" id="reg-name" name="name" class="form-input" placeholder="e.g. Maya Sen" required maxlength="100" />
+                </div>
+                <div class="form-group">
+                  <label for="reg-email" class="form-label">Email Address <span class="required">*</span></label>
+                  <input type="email" id="reg-email" name="email" class="form-input" placeholder="maya@example.com" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="reg-password" class="form-label">Password <span class="required">*</span></label>
+                <input type="password" id="reg-password" name="password" class="form-input" placeholder="At least 8 characters" required minlength="8" />
+              </div>
+              <div class="form-group">
+                <label for="reg-bio" class="form-label">Brief Literary / Artistic Bio (Optional)</label>
+                <textarea id="reg-bio" name="bio" class="form-textarea" rows="2" placeholder="Tell us about your creative interests..." maxlength="500"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="reg-submit-btn">Register & Join Community →</button>
+                <span class="auth-status-msg" id="reg-status-msg"></span>
+              </div>
+            </form>
+          </div>
+
+          <!-- Login Panel -->
+          <div class="tab-panel" id="panel-login" role="tabpanel" aria-labelledby="tab-login" style="display: none;">
+            <p class="panel-desc">Sign in to submit proposals or access your contributor dashboard.</p>
+            <form id="login-form" novalidate>
+              <div class="form-group">
+                <label for="login-email" class="form-label">Email Address <span class="required">*</span></label>
+                <input type="email" id="login-email" name="email" class="form-input" placeholder="your@email.com" required />
+              </div>
+              <div class="form-group">
+                <label for="login-password" class="form-label">Password <span class="required">*</span></label>
+                <input type="password" id="login-password" name="password" class="form-input" required />
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="login-submit-btn">Sign In →</button>
+                <span class="auth-status-msg" id="login-status-msg"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- View 2: Authenticated Member Dashboard & Participation Application -->
+        <div id="auth-view" style="display: none;">
+          <div class="member-welcome-banner">
+            <h3 class="welcome-heading">Welcome, <span id="member-display-name"></span>!</h3>
+            <p class="welcome-sub">You are registered as a <strong>Community Member</strong>. Your account grants access to comment discussions and allows you to apply for publishing or collaborative roles below.</p>
+          </div>
+
+          <!-- Section A: Apply for Participation -->
+          <div class="application-form-card" id="application-form-section">
+            <h4 class="card-subtitle">Submit a Participation Proposal</h4>
+            <p class="card-subtext">Choose your desired pathway and describe your creative background or proposal.</p>
+
+            <form id="participation-form" novalidate>
+              <div class="form-group">
+                <label for="app-intent" class="form-label">Select Participation Pathway <span class="required">*</span></label>
+                <select id="app-intent" name="intent" class="form-select" required>
+                  <option value="publish_work">Option 1: Apply to Publish Work (Poetry, Prose, or Art)</option>
+                  <option value="collaborate">Option 2: Apply to Collaborate with Author</option>
+                  <option value="both">Both: Publish Work & Propose Collaboration</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="app-proposal" class="form-label">Proposal or Work Overview <span class="required">*</span></label>
+                <textarea id="app-proposal" name="proposalText" class="form-textarea" rows="4" placeholder="Detail your creative proposal, themes of your writing, or nature of collaboration..." required maxlength="4000"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="app-background" class="form-label">Creative Background & Prior Publications (Optional)</label>
+                <textarea id="app-background" name="creativeBackground" class="form-textarea" rows="2" placeholder="List any journals, publications, portfolios, or background..." maxlength="2000"></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="app-submit-btn">Submit Participation Proposal →</button>
+                <span class="auth-status-msg" id="app-status-msg"></span>
+              </div>
+            </form>
+          </div>
+
+          <!-- Section B: Approved Contributor Portal (Visible only when isApprovedContributor is true) -->
+          <div class="contributor-portal-card" id="contributor-submission-section" style="display: none;">
+            <div class="contributor-badge-row">
+              <span class="badge badge-art">Approved Contributor Status • स्वीकृत रचनाकार</span>
+            </div>
+            <h4 class="card-subtitle">Submit Creative Work for Editorial Review</h4>
+            <p class="card-subtext">Your contributor status is active. Submissions will be held in our private draft queue for final editorial approval by the editor before publication.</p>
+
+            <form id="contributor-work-form" novalidate>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="sub-title" class="form-label">Work Title <span class="required">*</span></label>
+                  <input type="text" id="sub-title" name="title" class="form-input" required maxlength="250" />
+                </div>
+                <div class="form-group">
+                  <label for="sub-type" class="form-label">Content Medium <span class="required">*</span></label>
+                  <select id="sub-type" name="contentType" class="form-select" required>
+                    <option value="poem">Poem • कविता</option>
+                    <option value="story">Story • कथा</option>
+                    <option value="essay">Essay • निबंध</option>
+                    <option value="artwork">Visual Artwork • कला</option>
+                    <option value="thought">Philosophical Thought • विचार</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="sub-lang" class="form-label">Language <span class="required">*</span></label>
+                  <select id="sub-lang" name="language" class="form-select" required>
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="en">English</option>
+                    <option value="mixed">Bilingual / Mixed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="sub-script" class="form-label">Script <span class="required">*</span></label>
+                  <select id="sub-script" name="script" class="form-select" required>
+                    <option value="Deva">Devanagari (देवनागरी)</option>
+                    <option value="Latn">Latin</option>
+                    <option value="mixed">Mixed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sub-excerpt" class="form-label">Short Excerpt / Teaser <span class="required">*</span></label>
+                <textarea id="sub-excerpt" name="excerpt" class="form-textarea" rows="2" required maxlength="500"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="sub-body" class="form-label">Full Body Text (Poetic Stanzas or Prose) <span class="required">*</span></label>
+                <textarea id="sub-body" name="body" class="form-textarea" rows="8" placeholder="Enter stanza lines or prose paragraphs..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="sub-rights" class="form-label">Originality & Rights Declaration <span class="required">*</span></label>
+                <textarea id="sub-rights" name="rightsDeclaration" class="form-textarea" rows="2" placeholder="Declare that this is your original work and not an infringement on existing copyright..." required></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="sub-submit-btn">Submit Work Draft for Editorial Review →</button>
+                <span class="auth-status-msg" id="sub-status-msg"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .community-page-container {
+    max-width: 900px;
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-12);
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-block: var(--space-8) var(--space-10);
+  }
+
+  @media (max-width: 768px) {
+    .options-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .option-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .option-badge {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-crimson);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+  }
+
+  .option-title {
+    font-family: var(--font-display-en);
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+    margin-top: 0;
+    margin-bottom: var(--space-3);
+  }
+
+  .option-desc {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+  }
+
+  .option-points {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    flex-grow: 1;
+  }
+
+  .option-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.4;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-3);
+  }
+
+  /* Portal Styling */
+  .portal-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .portal-header {
+    background-color: var(--bg-subtle);
+    padding: var(--space-3) var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .user-status-display {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .status-indicator {
+    color: var(--accent-crimson);
+  }
+
+  .portal-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: var(--space-4);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-subtle);
+  }
+
+  .tab-btn.active {
+    color: var(--accent-crimson);
+    border-bottom-color: var(--accent-crimson);
+    background-color: var(--bg-surface);
+  }
+
+  .tab-panel {
+    padding: var(--space-6);
+  }
+
+  .panel-desc {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-top: 0;
+    margin-bottom: var(--space-5);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (max-width: 600px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+  }
+
+  .form-label {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .required {
+    color: var(--accent-crimson);
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-crimson);
+  }
+
+  .form-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+  }
+
+  .auth-status-msg {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .auth-status-msg.error {
+    color: #c02b2b;
+  }
+
+  .auth-status-msg.success {
+    color: #2b823b;
+  }
+
+  /* Authenticated Dashboard View */
+  .member-welcome-banner {
+    padding: var(--space-6);
+    background-color: var(--bg-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .welcome-heading {
+    margin: 0 0 var(--space-1) 0;
+    font-family: var(--font-display-en);
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+  }
+
+  .welcome-sub {
+    margin: 0;
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .application-form-card,
+  .contributor-portal-card {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .card-subtitle {
+    margin: 0 0 var(--space-1) 0;
+    font-family: var(--font-display-en);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+  }
+
+  .card-subtext {
+    margin: 0 0 var(--space-5) 0;
+    font-family: var(--font-prose-en);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .contributor-badge-row {
+    margin-bottom: var(--space-3);
+  }
+</style>
+
+<script>
+  function setupCommunityPortal() {
+    const unauthView = document.getElementById('unauth-view');
+    const authView = document.getElementById('auth-view');
+    const userStatusText = document.getElementById('user-status-text');
+    const memberDisplayName = document.getElementById('member-display-name');
+    const logoutBtn = document.getElementById('logout-btn');
+    const contributorSection = document.getElementById('contributor-submission-section');
+
+    const tabRegister = document.getElementById('tab-register');
+    const tabLogin = document.getElementById('tab-login');
+    const panelRegister = document.getElementById('panel-register');
+    const panelLogin = document.getElementById('panel-login');
+
+    const registerForm = document.getElementById('register-form') as HTMLFormElement;
+    const loginForm = document.getElementById('login-form') as HTMLFormElement;
+    const appForm = document.getElementById('participation-form') as HTMLFormElement;
+    const contributorForm = document.getElementById('contributor-work-form') as HTMLFormElement;
+
+    // Tab Switching
+    tabRegister?.addEventListener('click', () => {
+      tabRegister.classList.add('active');
+      tabLogin?.classList.remove('active');
+      if (panelRegister) panelRegister.style.display = 'block';
+      if (panelLogin) panelLogin.style.display = 'none';
+    });
+
+    tabLogin?.addEventListener('click', () => {
+      tabLogin.classList.add('active');
+      tabRegister?.classList.remove('active');
+      if (panelLogin) panelLogin.style.display = 'block';
+      if (panelRegister) panelRegister.style.display = 'none';
+    });
+
+    // Check current session
+    checkSession();
+
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/community/auth/me');
+        const json = await res.json();
+        if (json.success && json.authenticated && json.member) {
+          showAuthUI(json.member);
+        } else {
+          showUnauthUI();
+        }
+      } catch {
+        showUnauthUI();
+      }
+    }
+
+    function showAuthUI(member: any) {
+      if (unauthView) unauthView.style.display = 'none';
+      if (authView) authView.style.display = 'block';
+      if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      if (userStatusText) userStatusText.textContent = `Signed in: ${member.name} (${member.email})`;
+      if (memberDisplayName) memberDisplayName.textContent = member.name;
+
+      if (contributorSection) {
+        contributorSection.style.display = member.isApprovedContributor ? 'block' : 'none';
+      }
+    }
+
+    function showUnauthUI() {
+      if (unauthView) unauthView.style.display = 'block';
+      if (authView) authView.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (userStatusText) userStatusText.textContent = 'Guest Reader (Unauthenticated)';
+    }
+
+    // Register Handler
+    registerForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('reg-status-msg');
+      const name = (document.getElementById('reg-name') as HTMLInputElement).value;
+      const email = (document.getElementById('reg-email') as HTMLInputElement).value;
+      const password = (document.getElementById('reg-password') as HTMLInputElement).value;
+      const bio = (document.getElementById('reg-bio') as HTMLTextAreaElement).value;
+      const honeypot = (document.getElementById('reg-honeypot') as HTMLInputElement).value;
+
+      if (status) {
+        status.className = 'auth-status-msg';
+        status.textContent = 'Creating account...';
+      }
+
+      try {
+        const res = await fetch('/api/community/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, bio, honeypot })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showAuthUI(json.member);
+        } else {
+          if (status) {
+            status.className = 'auth-status-msg error';
+            status.textContent = json.error || 'Registration failed';
+          }
+        }
+      } catch {
+        if (status) {
+          status.className = 'auth-status-msg error';
+          status.textContent = 'Network error during registration.';
+        }
+      }
+    });
+
+    // Login Handler
+    loginForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('login-status-msg');
+      const email = (document.getElementById('login-email') as HTMLInputElement).value;
+      const password = (document.getElementById('login-password') as HTMLInputElement).value;
+
+      if (status) {
+        status.className = 'auth-status-msg';
+        status.textContent = 'Signing in...';
+      }
+
+      try {
+        const res = await fetch('/api/community/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showAuthUI(json.member);
+        } else {
+          if (status) {
+            status.className = 'auth-status-msg error';
+            status.textContent = json.error || 'Invalid credentials';
+          }
+        }
+      } catch {
+        if (status) {
+          status.className = 'auth-status-msg error';
+          status.textContent = 'Network error during login.';
+        }
+      }
+    });
+
+    // Logout Handler
+    logoutBtn?.addEventListener('click', async () => {
+      await fetch('/api/community/auth/logout', { method: 'POST' });
+      showUnauthUI();
+    });
+
+    // Application Handler
+    appForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('app-status-msg');
+      const intent = (document.getElementById('app-intent') as HTMLSelectElement).value;
+      const proposalText = (document.getElementById('app-proposal') as HTMLTextAreaElement).value;
+      const creativeBackground = (document.getElementById('app-background') as HTMLTextAreaElement).value;
+
+      if (status) {
+        status.className = 'auth-status-msg';
+        status.textContent = 'Submitting proposal...';
+      }
+
+      try {
+        const res = await fetch('/api/community/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ intent, proposalText, creativeBackground })
+        });
+        const json = await res.json();
+        if (json.success) {
+          appForm.reset();
+          if (status) {
+            status.className = 'auth-status-msg success';
+            status.textContent = json.message;
+          }
+        } else {
+          if (status) {
+            status.className = 'auth-status-msg error';
+            status.textContent = json.error || 'Failed to submit proposal';
+          }
+        }
+      } catch {
+        if (status) {
+          status.className = 'auth-status-msg error';
+          status.textContent = 'Network error submitting proposal.';
+        }
+      }
+    });
+
+    // Contributor Work Submission Handler
+    contributorForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('sub-status-msg');
+      const title = (document.getElementById('sub-title') as HTMLInputElement).value;
+      const contentType = (document.getElementById('sub-type') as HTMLSelectElement).value;
+      const language = (document.getElementById('sub-lang') as HTMLSelectElement).value;
+      const script = (document.getElementById('sub-script') as HTMLSelectElement).value;
+      const excerpt = (document.getElementById('sub-excerpt') as HTMLTextAreaElement).value;
+      const body = (document.getElementById('sub-body') as HTMLTextAreaElement).value;
+      const rightsDeclaration = (document.getElementById('sub-rights') as HTMLTextAreaElement).value;
+
+      if (status) {
+        status.className = 'auth-status-msg';
+        status.textContent = 'Submitting draft work...';
+      }
+
+      try {
+        const res = await fetch('/api/community/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, contentType, language, script, excerpt, body, rightsDeclaration })
+        });
+        const json = await res.json();
+        if (json.success) {
+          contributorForm.reset();
+          if (status) {
+            status.className = 'auth-status-msg success';
+            status.textContent = json.message;
+          }
+        } else {
+          if (status) {
+            status.className = 'auth-status-msg error';
+            status.textContent = json.error || 'Draft submission failed';
+          }
+        }
+      } catch {
+        if (status) {
+          status.className = 'auth-status-msg error';
+          status.textContent = 'Network error submitting draft.';
+        }
+      }
+    });
+  }
+
+  setupCommunityPortal();
+  document.addEventListener('astro:page-load', setupCommunityPortal);
+</script>

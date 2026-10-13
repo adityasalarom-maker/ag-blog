@@ -3,6 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import ZenModeToggle from '../../components/ZenModeToggle.astro';
 import WorkCard from '../../components/WorkCard.astro';
+import WorkReactions from '../../components/WorkReactions.astro';
+import WorkComments from '../../components/WorkComments.astro';
+import AuthorQueryModal from '../../components/AuthorQueryModal.astro';
 import { WORKS, type Work } from '../../data/fixtures';
 import { getRelatedWorks } from '../../lib/content/relatedWorks.ts';
 
@@ -122,6 +125,7 @@ const poemSchemas = [
       <div class="poem-actions">
         <ZenModeToggle />
         <ShareButton title={`${poem.title} — Poem by ${poem.creator}`} />
+        <AuthorQueryModal sourceWorkSlug={poem.slug} sourceWorkTitle={poem.title} />
       </div>
     </header>
 
@@ -201,6 +205,12 @@ const poemSchemas = [
         </div>
       </div>
     </section>
+
+    <!-- Reader Reactions: Like & Inspired -->
+    <WorkReactions workId={poem.id} workTitle={poem.title} isHindi={isHi} />
+
+    <!-- Reader Discussion & Threaded Reflections -->
+    <WorkComments workId={poem.id} workTitle={poem.title} isHindi={isHi} />
 
     <!-- Related Works Section (Bilingual Recommendation Engine) -->
     {relatedWorks.length > 0 && (

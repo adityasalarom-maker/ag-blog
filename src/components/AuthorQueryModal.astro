@@ -1,0 +1,471 @@
+---
+interface Props {
+  sourceWorkSlug?: string;
+  sourceWorkTitle?: string;
+  buttonLabel?: string;
+  buttonClass?: string;
+}
+
+const {
+  sourceWorkSlug = '',
+  sourceWorkTitle = '',
+  buttonLabel = 'Ask the Author • लेखक से पूछें',
+  buttonClass = 'btn btn-outline query-trigger-btn'
+} = Astro.props;
+---
+
+<!-- Trigger Button -->
+<button 
+  type="button" 
+  class={buttonClass} 
+  data-query-modal-trigger
+  data-work-slug={sourceWorkSlug}
+  data-work-title={sourceWorkTitle}
+  aria-haspopup="dialog"
+  aria-expanded="false"
+>
+  <span class="query-icon" aria-hidden="true">✉</span>
+  <span>{buttonLabel}</span>
+</button>
+
+<!-- Accessible Dialog Modal -->
+<div 
+  class="query-modal-backdrop" 
+  id="author-query-modal" 
+  role="dialog" 
+  aria-modal="true" 
+  aria-labelledby="query-dialog-title" 
+  hidden
+>
+  <div class="query-modal-content">
+    <div class="query-modal-header">
+      <div class="header-titles">
+        <span class="modal-badge">Private Author Query • व्यक्तिगत संवाद</span>
+        <h2 id="query-dialog-title" class="modal-title">Ask the Author</h2>
+      </div>
+      <button type="button" class="query-modal-close" id="query-modal-close-btn" aria-label="Close query modal">
+        ✕
+      </button>
+    </div>
+
+    <div class="query-modal-body">
+      <p class="modal-intro">
+        Send a direct, confidential inquiry to creator <strong>A. G. Varma</strong>. Your message will be formatted with reference tracking and delivered directly to the author's inbox.
+      </p>
+
+      <div class="source-work-indicator" id="modal-source-work-box" style="display: none;">
+        <span class="source-label">Regarding:</span>
+        <strong id="modal-source-title"></strong>
+      </div>
+
+      <form id="author-query-form" novalidate>
+        <input type="hidden" id="query-source-slug" name="sourceWorkSlug" value={sourceWorkSlug} />
+        <input type="hidden" id="query-source-title" name="sourceWorkTitle" value={sourceWorkTitle} />
+
+        <!-- Honeypot -->
+        <div style="display: none;" aria-hidden="true">
+          <input type="text" name="honeypot" id="query-honeypot" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="query-sender-name" class="modal-label">Your Name <span class="required">*</span></label>
+            <input type="text" id="query-sender-name" name="senderName" class="modal-input" placeholder="e.g. Maya Sen" required maxlength="100" />
+          </div>
+
+          <div class="form-group">
+            <label for="query-sender-email" class="modal-label">Your Email for Reply <span class="required">*</span></label>
+            <input type="email" id="query-sender-email" name="senderEmail" class="modal-input" placeholder="your.email@example.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="query-category" class="modal-label">Inquiry Category <span class="required">*</span></label>
+          <select id="query-category" name="category" class="modal-select" required>
+            <option value="question">Literary / Philosophical Question</option>
+            <option value="copyright_permission">Permission & Copyright Inquiry</option>
+            <option value="collaboration">Collaboration Proposal</option>
+            <option value="contribution">Publication / Contribution Inquiry</option>
+            <option value="general">General Reader Reflection</option>
+            <option value="other">Other Inquiry</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="query-subject" class="modal-label">Subject <span class="required">*</span></label>
+          <input type="text" id="query-subject" name="subject" class="modal-input" placeholder="Brief subject line" required maxlength="200" />
+        </div>
+
+        <div class="form-group">
+          <label for="query-message" class="modal-label">Message <span class="required">*</span></label>
+          <textarea id="query-message" name="message" class="modal-textarea" rows="4" placeholder="Enter your query or message..." required maxlength="5000"></textarea>
+        </div>
+
+        <div class="privacy-consent-box">
+          <label class="consent-label">
+            <input type="checkbox" id="query-privacy-consent" name="consentPrivacy" required />
+            <span>I consent to submitting this inquiry. My message will remain strictly private between myself and the author.</span>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" id="query-submit-btn">Send Query to Author →</button>
+          <button type="button" class="btn btn-outline" id="query-cancel-btn">Cancel</button>
+        </div>
+
+        <div class="modal-status-box" id="query-status-box" role="status" style="display: none;"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .query-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .query-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    z-index: 2000;
+  }
+
+  .query-modal-backdrop[hidden] {
+    display: none !important;
+  }
+
+  .query-modal-content {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 640px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalFadeIn 0.2s ease-out;
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .query-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+    background-color: var(--bg-subtle);
+  }
+
+  .modal-badge {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-crimson);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .modal-title {
+    font-family: var(--font-display-en);
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    margin: var(--space-1) 0 0 0;
+  }
+
+  .query-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--space-1);
+    line-height: 1;
+    border-radius: var(--radius-sm);
+  }
+
+  .query-modal-close:hover {
+    color: var(--text-primary);
+  }
+
+  .query-modal-body {
+    padding: var(--space-6);
+  }
+
+  .modal-intro {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .source-work-indicator {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--accent-crimson);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-4);
+  }
+
+  .source-label {
+    color: var(--text-muted);
+    margin-right: var(--space-2);
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  @media (max-width: 580px) {
+    .form-row-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+  }
+
+  .modal-label {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .required {
+    color: var(--accent-crimson);
+  }
+
+  .modal-input,
+  .modal-select,
+  .modal-textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease;
+  }
+
+  .modal-input:focus,
+  .modal-select:focus,
+  .modal-textarea:focus {
+    outline: none;
+    border-color: var(--accent-crimson);
+  }
+
+  .privacy-consent-box {
+    margin-block: var(--space-3) var(--space-5);
+  }
+
+  .consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  .modal-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .modal-status-box {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    line-height: 1.4;
+  }
+
+  .modal-status-box.success {
+    background-color: rgba(43, 130, 59, 0.1);
+    color: #1f6b2d;
+    border: 1px solid rgba(43, 130, 59, 0.3);
+  }
+
+  .modal-status-box.error {
+    background-color: rgba(192, 43, 43, 0.1);
+    color: #a81c1c;
+    border: 1px solid rgba(192, 43, 43, 0.3);
+  }
+</style>
+
+<script>
+  function setupQueryModal() {
+    const modal = document.getElementById('author-query-modal');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('query-modal-close-btn');
+    const cancelBtn = document.getElementById('query-cancel-btn');
+    const form = document.getElementById('author-query-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('query-submit-btn') as HTMLButtonElement;
+    const statusBox = document.getElementById('query-status-box') as HTMLElement;
+    const sourceBox = document.getElementById('modal-source-work-box') as HTMLElement;
+    const sourceTitle = document.getElementById('modal-source-title') as HTMLElement;
+    const sourceSlugInput = document.getElementById('query-source-slug') as HTMLInputElement;
+    const sourceTitleInput = document.getElementById('query-source-title') as HTMLInputElement;
+
+    function openModal(workSlug = '', workTitle = '') {
+      modal?.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+
+      if (workTitle) {
+        if (sourceBox) sourceBox.style.display = 'block';
+        if (sourceTitle) sourceTitle.textContent = workTitle;
+        if (sourceSlugInput) sourceSlugInput.value = workSlug;
+        if (sourceTitleInput) sourceTitleInput.value = workTitle;
+      } else {
+        if (sourceBox) sourceBox.style.display = 'none';
+      }
+
+      const firstInput = document.getElementById('query-sender-name');
+      firstInput?.focus();
+    }
+
+    function closeModal() {
+      modal?.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+      if (statusBox) statusBox.style.display = 'none';
+      form?.reset();
+    }
+
+    document.querySelectorAll('[data-query-modal-trigger]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const slug = target.getAttribute('data-work-slug') || '';
+        const title = target.getAttribute('data-work-title') || '';
+        openModal(slug, title);
+      });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+
+    // Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal?.hasAttribute('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Backdrop click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Form submission
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const senderName = (document.getElementById('query-sender-name') as HTMLInputElement).value;
+      const senderEmail = (document.getElementById('query-sender-email') as HTMLInputElement).value;
+      const category = (document.getElementById('query-category') as HTMLSelectElement).value;
+      const subject = (document.getElementById('query-subject') as HTMLInputElement).value;
+      const message = (document.getElementById('query-message') as HTMLTextAreaElement).value;
+      const consentPrivacy = (document.getElementById('query-privacy-consent') as HTMLInputElement).checked;
+      const honeypot = (document.getElementById('query-honeypot') as HTMLInputElement).value;
+
+      if (!consentPrivacy) {
+        if (statusBox) {
+          statusBox.className = 'modal-status-box error';
+          statusBox.textContent = 'Please check the consent box to proceed.';
+          statusBox.style.display = 'block';
+        }
+        return;
+      }
+
+      if (submitBtn) submitBtn.disabled = true;
+      if (statusBox) {
+        statusBox.className = 'modal-status-box';
+        statusBox.textContent = 'Transmitting query...';
+        statusBox.style.display = 'block';
+      }
+
+      try {
+        const res = await fetch('/api/community/queries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            senderName,
+            senderEmail,
+            category,
+            subject,
+            message,
+            sourceWorkSlug: sourceSlugInput?.value || undefined,
+            sourceWorkTitle: sourceTitleInput?.value || undefined,
+            consentPrivacy: true,
+            honeypot
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          form.reset();
+          if (statusBox) {
+            statusBox.className = 'modal-status-box success';
+            statusBox.innerHTML = `
+              <strong>Query Transmitted Successfully!</strong><br />
+              <strong>Reference ID:</strong> <code>${json.queryId}</code><br />
+              ${json.message}<br />
+              <em>Subject: ${json.emailSubject}</em>
+            `;
+            statusBox.style.display = 'block';
+          }
+          setTimeout(() => {
+            closeModal();
+          }, 4500);
+        } else {
+          if (statusBox) {
+            statusBox.className = 'modal-status-box error';
+            statusBox.textContent = json.error || 'Failed to submit query.';
+            statusBox.style.display = 'block';
+          }
+        }
+      } catch {
+        if (statusBox) {
+          statusBox.className = 'modal-status-box error';
+          statusBox.textContent = 'Network error while transmitting query. Please try again.';
+          statusBox.style.display = 'block';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  setupQueryModal();
+  document.addEventListener('astro:page-load', setupQueryModal);
+</script>

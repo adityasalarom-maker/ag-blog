@@ -1,0 +1,248 @@
+---
+interface Props {
+  workId: string;
+  workTitle: string;
+  isHindi?: boolean;
+}
+
+const { workId, workTitle, isHindi = false } = Astro.props;
+---
+
+<section class="work-reactions-section" aria-label={isHindi ? 'रचना प्रतिक्रियाएं' : 'Work Reactions'} data-work-id={workId}>
+  <div class="reactions-container">
+    <div class="reactions-intro">
+      <span class="reactions-prompt">
+        {isHindi ? 'इस रचना पर अपनी प्रतिक्रिया दें:' : 'Reflect on this piece:'}
+      </span>
+    </div>
+
+    <div class="reactions-button-group" role="group" aria-label="Work reactions">
+      <!-- Like Reaction Button -->
+      <button 
+        type="button" 
+        class="reaction-btn" 
+        id={`btn-like-${workId}`}
+        data-action="like"
+        aria-pressed="false"
+        aria-label={isHindi ? `इस रचना को पसंद करें (वर्तमान संख्या 0)` : `Like this work (current count 0)`}
+      >
+        <span class="reaction-icon" aria-hidden="true">♥</span>
+        <span class="reaction-label">{isHindi ? 'पसंद' : 'Like'}</span>
+        <span class="reaction-count" id={`count-like-${workId}`}>0</span>
+      </button>
+
+      <!-- Inspired Reaction Button -->
+      <button 
+        type="button" 
+        class="reaction-btn" 
+        id={`btn-inspired-${workId}`}
+        data-action="inspired"
+        aria-pressed="false"
+        aria-label={isHindi ? `इस रचना से प्रेरित हुए (वर्तमान संख्या 0)` : `Inspired by this work (current count 0)`}
+      >
+        <span class="reaction-icon" aria-hidden="true">✦</span>
+        <span class="reaction-label">{isHindi ? 'प्रेरित' : 'Inspired'}</span>
+        <span class="reaction-count" id={`count-inspired-${workId}`}>0</span>
+      </button>
+    </div>
+
+    <!-- Live Toast / Feedback announcement -->
+    <div class="reaction-live-feedback" aria-live="polite" id={`feedback-${workId}`}></div>
+  </div>
+</section>
+
+<style>
+  .work-reactions-section {
+    margin-block: var(--space-8) var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .reactions-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .reactions-intro {
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .reactions-button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .reaction-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline-offset: 2px;
+  }
+
+  .reaction-btn:hover {
+    border-color: var(--accent-crimson);
+    background-color: var(--bg-surface);
+    transform: translateY(-1px);
+  }
+
+  .reaction-btn:focus-visible {
+    outline: 2px solid var(--accent-crimson);
+  }
+
+  .reaction-btn[aria-pressed="true"] {
+    background-color: rgba(123, 24, 36, 0.08);
+    border-color: var(--accent-crimson);
+    color: var(--accent-crimson);
+  }
+
+  [data-theme="dark"] .reaction-btn[aria-pressed="true"] {
+    background-color: rgba(224, 90, 107, 0.15);
+  }
+
+  .reaction-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+
+  .reaction-btn:hover .reaction-icon {
+    transform: scale(1.15);
+  }
+
+  .reaction-btn[aria-pressed="true"] .reaction-icon {
+    transform: scale(1.1);
+  }
+
+  .reaction-count {
+    display: inline-block;
+    padding: 2px 7px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .reaction-btn[aria-pressed="true"] .reaction-count {
+    border-color: var(--accent-crimson);
+    color: var(--accent-crimson);
+  }
+
+  .reaction-live-feedback {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  @media (max-width: 600px) {
+    .reactions-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .reactions-button-group {
+      width: 100%;
+    }
+    .reaction-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  function setupReactions() {
+    const sections = document.querySelectorAll('.work-reactions-section');
+    sections.forEach(section => {
+      const workId = section.getAttribute('data-work-id');
+      if (!workId) return;
+
+      const likeBtn = section.querySelector('[data-action="like"]') as HTMLButtonElement;
+      const inspiredBtn = section.querySelector('[data-action="inspired"]') as HTMLButtonElement;
+      const likeCount = section.querySelector(`#count-like-${workId}`);
+      const inspiredCount = section.querySelector(`#count-inspired-${workId}`);
+      const feedback = section.querySelector(`#feedback-${workId}`);
+
+      // 1. Fetch initial counts from API
+      fetch(`/api/community/reactions?workId=${encodeURIComponent(workId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            updateUI(data.data);
+          }
+        })
+        .catch(() => {});
+
+      function updateUI(summary: { likeCount: number; inspiredCount: number; userLiked?: boolean; userInspired?: boolean }) {
+        if (likeCount) likeCount.textContent = summary.likeCount.toString();
+        if (inspiredCount) inspiredCount.textContent = summary.inspiredCount.toString();
+
+        if (likeBtn) {
+          likeBtn.setAttribute('aria-pressed', summary.userLiked ? 'true' : 'false');
+          likeBtn.setAttribute('aria-label', `Like this work (current count ${summary.likeCount})`);
+        }
+        if (inspiredBtn) {
+          inspiredBtn.setAttribute('aria-pressed', summary.userInspired ? 'true' : 'false');
+          inspiredBtn.setAttribute('aria-label', `Inspired by this work (current count ${summary.inspiredCount})`);
+        }
+      }
+
+      async function handleReaction(type: 'like' | 'inspired', btn: HTMLButtonElement) {
+        btn.disabled = true;
+        try {
+          const res = await fetch('/api/community/reactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ workId, reactionType: type })
+          });
+          const json = await res.json();
+          if (json.success && json.data) {
+            updateUI(json.data);
+            if (feedback) {
+              feedback.textContent = json.active 
+                ? `Reaction ${type} recorded.` 
+                : `Reaction ${type} removed.`;
+            }
+          }
+        } catch {
+          if (feedback) feedback.textContent = 'Could not update reaction. Please check your network connection.';
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      likeBtn?.addEventListener('click', () => handleReaction('like', likeBtn));
+      inspiredBtn?.addEventListener('click', () => handleReaction('inspired', inspiredBtn));
+    });
+  }
+
+  setupReactions();
+  document.addEventListener('astro:page-load', setupReactions);
+</script>

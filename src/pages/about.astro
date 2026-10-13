@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AuthorQueryModal from '../components/AuthorQueryModal.astro';
 import { PUBLICATION_INFO } from '../data/fixtures';
 import { getPeriodicalSchema, getBreadcrumbSchema } from '../lib/seo/schema.ts';
 
@@ -134,12 +135,14 @@ const aboutSchemas = [
           <h2>5. Editorial Contact</h2>
           <div class="prose-content">
             <p>
-              For literary inquiries, permission requests, or academic citation clearances, please reach out to the editor:
+              For literary inquiries, permission requests, or academic citation clearances, please reach out directly to creator and editor A. G. Varma:
             </p>
-            <div class="contact-box">
-              <span class="contact-label">Editorial Inquiries:</span>
-              <a href="mailto:editor@antigravityreview.org" class="contact-email">editor@antigravityreview.org</a>
+            <div class="contact-box" style="margin-bottom: var(--space-4);">
+              <AuthorQueryModal buttonLabel="Send a Confidential Inquiry • निजी संदेश भेजें" />
             </div>
+            <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-2);">
+              Inquiries are formatted with unique reference IDs and transmitted securely to the author's inbox.
+            </p>
           </div>
         </section>
       </main>

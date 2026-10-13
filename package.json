@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && node scripts/generate_static_search.mjs",
+    "build": "astro build",
+    "build:static": "astro build && node scripts/generate_static_search.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

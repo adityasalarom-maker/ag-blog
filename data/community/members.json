@@ -1,0 +1,15 @@
+[
+  {
+    "id": "mbr_1791934985333_ba0154d2",
+    "name": "Kavita Iyer",
+    "email": "writer_1791934985321@literaryclub.org",
+    "passwordHash": "f9778c1a3ddcc46f9aa5209a4d1e688327a564ca0901c572d83927b1b1814d95ea348c8cb05b4bb2a1cdac8ef9f1c0d401a63be8f985ba7cab195a46b1f6ceeb",
+    "passwordSalt": "55b0e4717ab9af1f2a2f9a99fb0fbd37",
+    "role": "community_member",
+    "bio": "Bilingual poet exploring contemporary verse and Devanagari translation.",
+    "status": "active",
+    "isApprovedContributor": true,
+    "isApprovedCollaborator": false,
+    "createdAt": "2026-10-13T23:43:05.333Z"
+  }
+]

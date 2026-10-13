@@ -1,0 +1,665 @@
+---
+interface Props {
+  workId: string;
+  workTitle: string;
+  isHindi?: boolean;
+}
+
+const { workId, workTitle, isHindi = false } = Astro.props;
+---
+
+<section 
+  class="work-comments-section" 
+  id="comments-section" 
+  aria-label={isHindi ? 'पाठक टिप्पणियाँ व संवाद' : 'Reader Comments & Discussion'}
+  data-work-id={workId}
+>
+  <div class="comments-header">
+    <div class="comments-title-row">
+      <h3 class="comments-heading">
+        {isHindi ? 'पाठक संवाद • Reader Discussion' : 'Reader Discussion & Reflections'}
+      </h3>
+      <span class="comment-count-badge" id={`comments-badge-${workId}`}>0 comments</span>
+    </div>
+    <p class="comments-subtext">
+      {isHindi 
+        ? 'इस रचना पर अपने विचार, व्याख्या या अनुभूतियाँ साझा करें। शिष्ट और रचनात्मक संवाद का स्वागत है।' 
+        : 'Share your literary reflections, interpretations, or dialogue on this work. Respectful discourse is welcomed.'}
+    </p>
+  </div>
+
+  <!-- Main Comment Submission Form -->
+  <form class="comment-form" id={`form-comment-${workId}`} novalidate>
+    <div class="form-grid">
+      <div class="form-group name-group">
+        <label for={`author-name-${workId}`} class="form-label">
+          {isHindi ? 'आपका नाम / Your Name' : 'Your Name'} <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          id={`author-name-${workId}`} 
+          name="authorName" 
+          class="form-input" 
+          placeholder={isHindi ? 'उदा. रवि शंकर' : 'e.g. Eleanor Vance'} 
+          maxlength="80"
+          required 
+        />
+      </div>
+
+      <div class="form-group email-group">
+        <label for={`author-email-${workId}`} class="form-label">
+          {isHindi ? 'ईमेल (गोपनीय रहेगा)' : 'Email (Private, optional)'}
+        </label>
+        <input 
+          type="email" 
+          id={`author-email-${workId}`} 
+          name="authorEmail" 
+          class="form-input" 
+          placeholder="your.email@example.com" 
+        />
+      </div>
+    </div>
+
+    <!-- Anti-bot honeypot field -->
+    <div class="honeypot-field" aria-hidden="true" style="display: none;">
+      <label for={`hp-field-${workId}`}>Leave this field blank</label>
+      <input type="text" id={`hp-field-${workId}`} name="honeypot" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="form-group">
+      <label for={`comment-content-${workId}`} class="form-label">
+        {isHindi ? 'आपकी टिप्पणी / Your Reflection' : 'Your Reflection'} <span class="required">*</span>
+      </label>
+      <textarea 
+        id={`comment-content-${workId}`} 
+        name="content" 
+        class="form-textarea" 
+        rows="3" 
+        placeholder={isHindi ? 'इस रचना पर अपने विचार लिखें...' : 'Write your literary reflection or comment here...'}
+        maxlength="1500"
+        required
+      ></textarea>
+      <span class="char-limit-indicator">Max 1500 characters</span>
+    </div>
+
+    <div class="form-actions-row">
+      <button type="submit" class="btn btn-primary submit-comment-btn" id={`submit-btn-${workId}`}>
+        {isHindi ? 'टिप्पणी प्रकाशित करें →' : 'Publish Reflection →'}
+      </button>
+      <span class="form-status-msg" id={`form-status-${workId}`} role="status"></span>
+    </div>
+  </form>
+
+  <!-- Comments Discussion List -->
+  <div class="comments-list-wrapper">
+    <div class="loading-state" id={`loading-${workId}`}>
+      <span class="spinner">✦</span> Loading reflections...
+    </div>
+
+    <div class="empty-state" id={`empty-${workId}`} style="display: none;">
+      <p class="empty-text">
+        {isHindi ? 'अभी कोई टिप्पणी नहीं है। संवाद शुरू करने वाले पहले पाठक बनें।' : 'No reflections yet. Be the first reader to share your thoughts.'}
+      </p>
+    </div>
+
+    <div class="comments-feed" id={`feed-${workId}`}>
+      <!-- Dynamic comments inserted here via JS -->
+    </div>
+
+    <!-- Incremental Load More Button -->
+    <div class="load-more-comments-row" id={`load-more-row-${workId}`} style="display: none;">
+      <button type="button" class="btn btn-outline load-more-btn" id={`load-more-btn-${workId}`}>
+        {isHindi ? 'और टिप्पणियाँ देखें ↓' : 'Load More Reflections ↓'}
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .work-comments-section {
+    margin-block: var(--space-8);
+    padding: var(--space-8) var(--space-6);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .comments-header {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .comments-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .comments-heading {
+    font-family: var(--font-display-en);
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .comment-count-badge {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    padding: 3px 10px;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    color: var(--text-secondary);
+  }
+
+  .comments-subtext {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-top: var(--space-2);
+    margin-bottom: 0;
+  }
+
+  .comment-form {
+    background-color: var(--bg-subtle);
+    padding: var(--space-5);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-8);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  @media (max-width: 600px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+  }
+
+  .form-label {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .required {
+    color: var(--accent-crimson);
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-crimson);
+    box-shadow: 0 0 0 2px rgba(123, 24, 36, 0.15);
+  }
+
+  .char-limit-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  .form-actions-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+  }
+
+  .submit-comment-btn {
+    padding: 0.6rem 1.4rem;
+    font-size: var(--text-sm);
+  }
+
+  .form-status-msg {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .form-status-msg.error {
+    color: #c02b2b;
+  }
+
+  .form-status-msg.success {
+    color: #2b823b;
+  }
+
+  /* Comments Feed & Items */
+  .comments-feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  :global(.comment-card) {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-5);
+    transition: border-color 0.15s ease;
+  }
+
+  :global(.comment-card:hover) {
+    border-color: var(--border-bold);
+  }
+
+  :global(.comment-card-header) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  :global(.comment-author) {
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  :global(.comment-time) {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  :global(.comment-body) {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-3) 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  :global(.comment-actions-bar) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  :global(.comment-like-btn),
+  :global(.comment-reply-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  :global(.comment-like-btn:hover),
+  :global(.comment-reply-btn:hover) {
+    color: var(--accent-crimson);
+    background-color: var(--bg-subtle);
+  }
+
+  :global(.comment-like-btn[aria-pressed="true"]) {
+    color: var(--accent-crimson);
+    font-weight: 700;
+  }
+
+  /* 1-Level Threaded Replies */
+  :global(.replies-thread) {
+    margin-top: var(--space-3);
+    margin-left: var(--space-6);
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  :global(.reply-card) {
+    background-color: var(--bg-subtle);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+  }
+
+  :global(.reply-form-container) {
+    margin-top: var(--space-3);
+    margin-left: var(--space-6);
+    padding: var(--space-3);
+    background-color: var(--bg-subtle);
+    border: 1px dashed var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+
+  .loading-state,
+  .empty-state {
+    text-align: center;
+    padding: var(--space-6);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .load-more-comments-row {
+    text-align: center;
+    margin-top: var(--space-6);
+  }
+</style>
+
+<script>
+  function setupComments() {
+    const sections = document.querySelectorAll('.work-comments-section');
+    sections.forEach(section => {
+      const workId = section.getAttribute('data-work-id');
+      if (!workId) return;
+
+      const badge = section.querySelector(`#comments-badge-${workId}`);
+      const feed = section.querySelector(`#feed-${workId}`);
+      const loading = section.querySelector(`#loading-${workId}`) as HTMLElement;
+      const empty = section.querySelector(`#empty-${workId}`) as HTMLElement;
+      const form = section.querySelector(`#form-comment-${workId}`) as HTMLFormElement;
+      const submitBtn = section.querySelector(`#submit-btn-${workId}`) as HTMLButtonElement;
+      const statusMsg = section.querySelector(`#form-status-${workId}`) as HTMLElement;
+      const loadMoreRow = section.querySelector(`#load-more-row-${workId}`) as HTMLElement;
+      const loadMoreBtn = section.querySelector(`#load-more-btn-${workId}`) as HTMLButtonElement;
+
+      let currentPage = 1;
+
+      // 1. Load initial comments
+      loadComments(1);
+
+      async function loadComments(page = 1, append = false) {
+        if (!append && loading) loading.style.display = 'block';
+        try {
+          const res = await fetch(`/api/community/comments?workId=${encodeURIComponent(workId)}&page=${page}&limit=10`);
+          const json = await res.json();
+          if (json.success && json.data) {
+            currentPage = page;
+            renderComments(json.data, append);
+          }
+        } catch {
+          if (loading) loading.style.display = 'none';
+        }
+      }
+
+      function renderComments(data: any, append: boolean) {
+        if (loading) loading.style.display = 'none';
+        if (badge) badge.textContent = `${data.totalComments} ${data.totalComments === 1 ? 'reflection' : 'reflections'}`;
+
+        if (!append && feed) feed.innerHTML = '';
+
+        if (data.comments.length === 0 && !append) {
+          if (empty) empty.style.display = 'block';
+          if (loadMoreRow) loadMoreRow.style.display = 'none';
+          return;
+        }
+
+        if (empty) empty.style.display = 'none';
+        if (loadMoreRow) loadMoreRow.style.display = data.hasMore ? 'block' : 'none';
+
+        data.comments.forEach((c: any) => {
+          const card = document.createElement('article');
+          card.className = 'comment-card';
+          card.id = `comment-${c.id}`;
+
+          const dateStr = new Date(c.createdAt).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+
+          // Build replies HTML
+          let repliesHtml = '';
+          if (c.replies && c.replies.length > 0) {
+            repliesHtml = `<div class="replies-thread">
+              ${c.replies.map((r: any) => `
+                <div class="reply-card" id="reply-${r.id}">
+                  <div class="comment-card-header">
+                    <span class="comment-author">${escapeHtml(r.authorName)}</span>
+                    <time class="comment-time" datetime="${r.createdAt}">${new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</time>
+                  </div>
+                  <p class="comment-body">${escapeHtml(r.content)}</p>
+                  <div class="comment-actions-bar">
+                    <button type="button" class="comment-like-btn" data-comment-id="${r.id}" aria-pressed="${r.userLiked ? 'true' : 'false'}">
+                      <span>♥</span> <span class="like-counter">${r.likeCount || 0}</span>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>`;
+          }
+
+          card.innerHTML = `
+            <div class="comment-card-header">
+              <span class="comment-author">${escapeHtml(c.authorName)}</span>
+              <time class="comment-time" datetime="${c.createdAt}">${dateStr}</time>
+            </div>
+            <p class="comment-body">${escapeHtml(c.content)}</p>
+            <div class="comment-actions-bar">
+              <button type="button" class="comment-like-btn" data-comment-id="${c.id}" aria-pressed="${c.userLiked ? 'true' : 'false'}">
+                <span>♥</span> <span class="like-counter">${c.likeCount || 0}</span>
+              </button>
+              <button type="button" class="comment-reply-btn" data-parent-id="${c.id}">
+                <span>↩</span> Reply
+              </button>
+            </div>
+            ${repliesHtml}
+            <div class="reply-form-slot" id="reply-slot-${c.id}"></div>
+          `;
+
+          feed?.appendChild(card);
+        });
+
+        attachActionListeners();
+      }
+
+      function attachActionListeners() {
+        // Comment Like Buttons
+        section.querySelectorAll('.comment-like-btn').forEach(btn => {
+          btn.replaceWith(btn.cloneNode(true)); // remove stale listeners
+        });
+
+        section.querySelectorAll('.comment-like-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const target = e.currentTarget as HTMLButtonElement;
+            const commentId = target.getAttribute('data-comment-id');
+            if (!commentId) return;
+
+            try {
+              const res = await fetch('/api/community/comments/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commentId })
+              });
+              const json = await res.json();
+              if (json.success) {
+                target.setAttribute('aria-pressed', json.active ? 'true' : 'false');
+                const counter = target.querySelector('.like-counter');
+                if (counter) counter.textContent = json.likeCount.toString();
+              }
+            } catch {}
+          });
+        });
+
+        // Reply Buttons
+        section.querySelectorAll('.comment-reply-btn').forEach(btn => {
+          btn.replaceWith(btn.cloneNode(true));
+        });
+
+        section.querySelectorAll('.comment-reply-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const target = e.currentTarget as HTMLButtonElement;
+            const parentId = target.getAttribute('data-parent-id');
+            if (!parentId) return;
+
+            const slot = section.querySelector(`#reply-slot-${parentId}`);
+            if (!slot) return;
+
+            if (slot.innerHTML.trim().length > 0) {
+              slot.innerHTML = '';
+              return;
+            }
+
+            slot.innerHTML = `
+              <div class="reply-form-container">
+                <form class="inline-reply-form" data-parent-id="${parentId}">
+                  <div class="form-group">
+                    <input type="text" class="form-input reply-name" placeholder="Your Name" required maxlength="80" />
+                  </div>
+                  <div class="form-group">
+                    <textarea class="form-textarea reply-content" rows="2" placeholder="Write your reply..." required maxlength="1000"></textarea>
+                  </div>
+                  <div class="form-actions-row">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 12px;">Post Reply</button>
+                    <button type="button" class="btn btn-outline cancel-reply-btn" style="padding: 0.4rem 0.9rem; font-size: 12px;">Cancel</button>
+                    <span class="reply-status" style="font-size: 11px;"></span>
+                  </div>
+                </form>
+              </div>
+            `;
+
+            const replyForm = slot.querySelector('.inline-reply-form') as HTMLFormElement;
+            const cancelBtn = slot.querySelector('.cancel-reply-btn') as HTMLButtonElement;
+            cancelBtn?.addEventListener('click', () => { slot.innerHTML = ''; });
+
+            replyForm?.addEventListener('submit', async (ev) => {
+              ev.preventDefault();
+              const nameInput = replyForm.querySelector('.reply-name') as HTMLInputElement;
+              const contentInput = replyForm.querySelector('.reply-content') as HTMLTextAreaElement;
+              const status = replyForm.querySelector('.reply-status') as HTMLElement;
+
+              try {
+                const res = await fetch('/api/community/comments', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    workId,
+                    parentCommentId: parentId,
+                    authorName: nameInput.value,
+                    content: contentInput.value
+                  })
+                });
+                const json = await res.json();
+                if (json.success) {
+                  slot.innerHTML = '';
+                  loadComments(1, false);
+                } else {
+                  if (status) status.textContent = json.error || 'Failed to submit reply';
+                }
+              } catch {
+                if (status) status.textContent = 'Network error submitting reply.';
+              }
+            });
+          });
+        });
+      }
+
+      // Main Comment Submission
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const authorNameInput = form.querySelector('[name="authorName"]') as HTMLInputElement;
+        const authorEmailInput = form.querySelector('[name="authorEmail"]') as HTMLInputElement;
+        const contentInput = form.querySelector('[name="content"]') as HTMLTextAreaElement;
+        const hpInput = form.querySelector('[name="honeypot"]') as HTMLInputElement;
+
+        if (statusMsg) {
+          statusMsg.className = 'form-status-msg';
+          statusMsg.textContent = 'Submitting...';
+        }
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+          const res = await fetch('/api/community/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              workId,
+              authorName: authorNameInput.value,
+              authorEmail: authorEmailInput.value,
+              content: contentInput.value,
+              honeypot: hpInput.value
+            })
+          });
+
+          const json = await res.json();
+          if (json.success) {
+            form.reset();
+            if (statusMsg) {
+              statusMsg.className = 'form-status-msg success';
+              statusMsg.textContent = 'Reflection published successfully!';
+            }
+            loadComments(1, false);
+            setTimeout(() => { if (statusMsg) statusMsg.textContent = ''; }, 4000);
+          } else {
+            if (statusMsg) {
+              statusMsg.className = 'form-status-msg error';
+              statusMsg.textContent = json.error || 'Could not submit comment.';
+            }
+          }
+        } catch {
+          if (statusMsg) {
+            statusMsg.className = 'form-status-msg error';
+            statusMsg.textContent = 'Network error. Please try again.';
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      });
+
+      // Load More
+      loadMoreBtn?.addEventListener('click', () => {
+        loadComments(currentPage + 1, true);
+      });
+
+      function escapeHtml(str: string): string {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+    });
+  }
+
+  setupComments();
+  document.addEventListener('astro:page-load', setupComments);
+</script>
