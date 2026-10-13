@@ -1,0 +1,106 @@
+---
+interface Props {
+  title: string;
+  url?: string;
+}
+
+const { title, url } = Astro.props;
+---
+
+<div class="share-actions" data-share-container data-title={title} data-url={url || ''}>
+  <button type="button" class="btn btn-outline share-btn" data-share-trigger aria-label="Share this work">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+    <span>Share Work</span>
+  </button>
+
+  <a class="btn btn-outline whatsapp-btn" data-whatsapp-link target="_blank" rel="noopener noreferrer" aria-label="Share via WhatsApp">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.584 1.761.817 2.802.817l.006-.001c3.177 0 5.763-2.586 5.764-5.767.001-3.181-2.584-5.767-5.776-5.802zm0 10.445c-.879 0-1.637-.253-2.34-.698l-.168-.106-1.574.413.42-1.533-.116-.184c-.482-.767-.736-1.554-.736-2.569 0-2.451 1.994-4.445 4.446-4.445 2.449 0 4.443 1.994 4.444 4.446 0 2.452-1.995 4.475-4.447 4.475zm6.576-13.882c-1.849-1.85-4.306-2.868-6.918-2.868-5.385 0-9.768 4.382-9.771 9.77 0 1.722.45 3.402 1.304 4.881l-1.387 5.068 5.185-1.36c1.42.775 3.023 1.184 4.664 1.185h.005c5.385 0 9.77-4.383 9.772-9.771 0-2.612-1.019-5.07-2.854-6.905z"/>
+    </svg>
+    <span>WhatsApp</span>
+  </a>
+
+  <span class="copy-toast" data-copy-toast aria-live="polite">Link Copied!</span>
+</div>
+
+<style>
+  .share-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    position: relative;
+  }
+
+  .copy-toast {
+    position: absolute;
+    bottom: -32px;
+    left: 0;
+    background-color: var(--text-primary);
+    color: var(--bg-page);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+  }
+
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  function setupShareButtons() {
+    document.querySelectorAll<HTMLElement>('[data-share-container]').forEach(container => {
+      const title = container.getAttribute('data-title') || document.title;
+      const explicitUrl = container.getAttribute('data-url');
+      const shareUrl = explicitUrl ? (explicitUrl.startsWith('http') ? explicitUrl : window.location.origin + explicitUrl) : window.location.href;
+      
+      const shareBtn = container.querySelector('[data-share-trigger]');
+      const whatsappBtn = container.querySelector<HTMLAnchorElement>('[data-whatsapp-link]');
+      const toast = container.querySelector('[data-copy-toast]');
+
+      // Configure WhatsApp link
+      if (whatsappBtn) {
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' — ' + shareUrl)}`;
+      }
+
+      shareBtn?.addEventListener('click', async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({ title, url: shareUrl });
+          } catch {
+            // User cancelled or share failed, fallback to copy
+            copyToClipboard(shareUrl, toast);
+          }
+        } else {
+          copyToClipboard(shareUrl, toast);
+        }
+      });
+    });
+
+    function copyToClipboard(text: string, toast: Element | null) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+      });
+    }
+  }
+
+  setupShareButtons();
+  document.addEventListener('astro:page-load', setupShareButtons);
+</script>

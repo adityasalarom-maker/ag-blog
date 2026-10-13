@@ -1,0 +1,74 @@
+---
+// FontSizer.astro — Reader font scale adjustment widget
+---
+<div class="font-sizer" role="group" aria-label="Reading text size adjustments">
+  <button type="button" class="size-btn" id="font-decrease" title="Decrease font size" aria-label="Decrease font size">
+    A−
+  </button>
+  <button type="button" class="size-btn size-reset" id="font-reset" title="Reset font size to default" aria-label="Reset font size">
+    A
+  </button>
+  <button type="button" class="size-btn" id="font-increase" title="Increase font size" aria-label="Increase font size">
+    A+
+  </button>
+</div>
+
+<style>
+  .font-sizer {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 2px;
+  }
+
+  .size-btn {
+    background: transparent;
+    border: none;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition: all 0.15s ease;
+  }
+
+  .size-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+  }
+
+  .size-reset {
+    font-size: 0.8rem;
+  }
+</style>
+
+<script>
+  function setupFontSizer() {
+    let scale = parseFloat(localStorage.getItem('ag-font-scale') || '1');
+    const minScale = 0.85;
+    const maxScale = 1.35;
+    const step = 0.08;
+
+    function applyScale(newScale: number) {
+      scale = Math.min(Math.max(newScale, minScale), maxScale);
+      document.documentElement.style.setProperty('--font-scale', scale.toString());
+      localStorage.setItem('ag-font-scale', scale.toString());
+    }
+
+    // Apply saved scale on load
+    if (scale !== 1) {
+      document.documentElement.style.setProperty('--font-scale', scale.toString());
+    }
+
+    document.getElementById('font-decrease')?.addEventListener('click', () => applyScale(scale - step));
+    document.getElementById('font-increase')?.addEventListener('click', () => applyScale(scale + step));
+    document.getElementById('font-reset')?.addEventListener('click', () => applyScale(1));
+  }
+
+  setupFontSizer();
+  document.addEventListener('astro:page-load', setupFontSizer);
+</script>

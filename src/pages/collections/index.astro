@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { COLLECTIONS, WORKS } from '../../data/fixtures';
+---
+
+<BaseLayout 
+  title="Thematic Collections (संपादकीय संग्रह) — Antigravity Review"
+  description="Curated literary and visual anthologies grouping poems, essays, and artworks around unified contemplative themes."
+>
+  <div class="container page-container">
+    <header class="page-header">
+      <span class="badge badge-prose">Anthologies • संपादकीय संग्रह</span>
+      <h1 class="page-title">Curated Collections</h1>
+      <p class="page-subtitle">
+        Cross-genre anthologies where poetry, personal essays, philosophy, and visual artworks converge around shared emotional and aesthetic thresholds.
+      </p>
+    </header>
+
+    <div class="collections-list">
+      {COLLECTIONS.map(collection => {
+        const matchingWorks = WORKS.filter(w => collection.itemSlugs.includes(w.slug));
+        return (
+          <article class="collection-entry-card" id={collection.slug}>
+            <div class="entry-media">
+              <img src={collection.coverImage} alt={collection.title} loading="lazy" class="entry-cover-img" />
+            </div>
+
+            <div class="entry-content">
+              <div class="entry-header">
+                <span class="entry-work-count">{matchingWorks.length} Interlinked Works</span>
+                <h2 class="entry-title">
+                  <a href={`/collections/${collection.slug}`}>{collection.title}</a>
+                </h2>
+                {collection.titleHi && <span class="entry-title-hi">{collection.titleHi}</span>}
+              </div>
+
+              <p class="entry-desc">{collection.description}</p>
+              
+              <div class="curator-note-box">
+                <strong>Curator's Note:</strong> {collection.curatorNote}
+              </div>
+
+              <div class="entry-preview-list">
+                <span class="preview-label">Includes:</span>
+                <ul class="preview-items">
+                  {matchingWorks.map(w => (
+                    <li>
+                      <span class={`type-dot dot-${w.contentType}`}></span>
+                      <span>{w.title}</span>
+                      <small>({w.contentType})</small>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div class="entry-footer">
+                <a href={`/collections/${collection.slug}`} class="btn btn-primary">
+                  Enter Anthology & Read All Works →
+                </a>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-container {
+    padding-top: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-subtitle {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    max-width: 680px;
+    line-height: 1.6;
+  }
+
+  .collections-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .collection-entry-card {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .entry-media {
+    background-color: #0b0c0e;
+    overflow: hidden;
+  }
+
+  .entry-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .entry-content {
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .entry-work-count {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-gold);
+    display: block;
+    margin-bottom: var(--space-1);
+  }
+
+  .entry-title {
+    font-family: var(--font-display-en);
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    margin: 0;
+  }
+
+  .entry-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .entry-title a:hover {
+    color: var(--accent-crimson);
+  }
+
+  .entry-title-hi {
+    font-family: var(--font-display-hi);
+    color: var(--accent-crimson);
+    font-size: var(--text-base);
+    display: block;
+  }
+
+  .entry-desc {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .curator-note-box {
+    background-color: var(--bg-subtle);
+    border-left: 3px solid var(--accent-gold);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .entry-preview-list {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-3);
+  }
+
+  .preview-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .preview-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--text-primary);
+  }
+
+  .preview-items li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .type-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .dot-poem { background-color: var(--accent-crimson); }
+  .dot-story, .dot-essay { background-color: var(--accent-gold); }
+  .dot-artwork { background-color: var(--accent-indigo); }
+  .dot-thought, .dot-quote { background-color: #555; }
+
+  .entry-footer {
+    margin-top: auto;
+    padding-top: var(--space-4);
+  }
+
+  @media (max-width: 860px) {
+    .collection-entry-card {
+      grid-template-columns: 1fr;
+    }
+    .entry-media {
+      height: 240px;
+    }
+  }
+</style>

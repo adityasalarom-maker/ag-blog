@@ -1,0 +1,112 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ArtworkModal from '../components/ArtworkModal.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  lang?: 'en' | 'hi' | 'mixed';
+  type?: 'website' | 'article';
+}
+
+const {
+  title = "Antigravity Review — A Bilingual Journal of Poetry, Ideas & Visual Arts",
+  description = "A creator-led digital publication dedicated to contemplative reading, Hindi and English poetry, narrative prose, and fine visual arts.",
+  image = "/images/artworks/twilight_melancholy.jpg",
+  lang = "en",
+  type = "website"
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ag-literary-publication.pages.dev');
+const socialImageURL = new URL(image, Astro.site || 'https://ag-literary-publication.pages.dev');
+---
+
+<!doctype html>
+<html lang={lang} data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Primary SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:site_name" content="Antigravity Review" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+
+    <!-- Pre-Hydration Reader Preference Script (Prevents Theme/Font Flicker) -->
+    <script is:inline>
+      try {
+        const savedTheme = localStorage.getItem('ag-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        const savedScale = localStorage.getItem('ag-font-scale');
+        if (savedScale) {
+          document.documentElement.style.setProperty('--font-scale', savedScale);
+        }
+      } catch (e) {
+        // Fallback gracefully if localStorage is restricted
+      }
+    </script>
+  </head>
+
+  <body id="top">
+    <!-- Accessible Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main literary content</a>
+
+    <Header />
+
+    <main id="main-content" class="site-main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Global Accessible Artwork Lightbox Modal -->
+    <ArtworkModal />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: var(--space-4);
+    background: var(--text-primary);
+    color: var(--bg-page);
+    padding: var(--space-2) var(--space-4);
+    z-index: 100;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--text-xs);
+    border-radius: var(--radius-sm);
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: var(--space-4);
+  }
+
+  .site-main {
+    flex: 1;
+    width: 100%;
+    padding-bottom: var(--space-16);
+  }
+</style>

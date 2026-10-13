@@ -1,0 +1,267 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import FontSizer from './FontSizer.astro';
+import { PUBLICATION_INFO } from '../data/fixtures';
+
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { label: 'Front Page', href: '/' },
+  { label: 'Poetry (कविता)', href: '/poetry' },
+  { label: 'Prose & Essays', href: '/prose' },
+  { label: 'Thoughts & Quotes', href: '/thoughts' },
+  { label: 'Art Gallery (वीथिका)', href: '/gallery' },
+  { label: 'Collections', href: '/collections' },
+  { label: 'Archive', href: '/archive' },
+  { label: 'About', href: '/about' }
+];
+---
+
+<header class="site-header">
+  <!-- Top Utility Bar: Reader Comfort Controls -->
+  <div class="utility-bar">
+    <div class="container utility-content">
+      <div class="edition-notice">
+        <span class="pulse-dot"></span>
+        <span class="edition-text">Vol. I, Issue 1 — Autumn 2026 • Bilingual Edition (हिंदी / English)</span>
+      </div>
+      <div class="controls-group">
+        <FontSizer />
+        <ThemeToggle />
+      </div>
+    </div>
+  </div>
+
+  <!-- Primary Masthead -->
+  <div class="container masthead-container">
+    <div class="masthead-center">
+      <a href="/" class="masthead-brand" aria-label="Antigravity Review Home">
+        <span class="masthead-ornament">✦</span>
+        <h1 class="masthead-name">{PUBLICATION_INFO.name}</h1>
+        <span class="masthead-name-hi">{PUBLICATION_INFO.nameHi}</span>
+        <span class="masthead-ornament">✦</span>
+      </a>
+      <p class="masthead-tagline">{PUBLICATION_INFO.tagline}</p>
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="main-nav" aria-label="Primary Site Navigation">
+    <div class="container nav-container">
+      <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span>Sections</span>
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        {navItems.map(item => {
+          const isActive = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href));
+          return (
+            <li class="nav-item">
+              <a href={item.href} class={`nav-link ${isActive ? 'active' : ''}`} aria-current={isActive ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 2px solid var(--border-strong);
+    background-color: var(--bg-page);
+    position: relative;
+    z-index: 50;
+  }
+
+  .utility-bar {
+    background-color: var(--bg-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-block: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .utility-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .edition-notice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-crimson);
+    display: inline-block;
+  }
+
+  .controls-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .masthead-container {
+    padding-block: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  .masthead-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .masthead-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+
+  .masthead-ornament {
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+  }
+
+  .masthead-name {
+    font-family: var(--font-masthead);
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .masthead-name-hi {
+    display: block;
+    font-family: var(--font-display-hi);
+    font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+    color: var(--accent-crimson);
+    letter-spacing: 0.05em;
+    margin-top: -2px;
+  }
+
+  .masthead-tagline {
+    font-family: var(--font-prose-en);
+    font-style: italic;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-top: var(--space-2);
+  }
+
+  .main-nav {
+    border-top: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface);
+  }
+
+  .nav-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    background: transparent;
+    border: none;
+    padding: var(--space-3) var(--space-2);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    width: 100%;
+    padding-block: var(--space-2);
+  }
+
+  .nav-link {
+    display: inline-block;
+    padding: 0.4rem 0.6rem;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--accent-crimson);
+    background-color: var(--bg-subtle);
+  }
+
+  .nav-link.active {
+    color: var(--accent-crimson);
+    font-weight: 700;
+    border-bottom: 2px solid var(--accent-crimson);
+    border-radius: 0;
+  }
+
+  @media (max-width: 860px) {
+    .edition-text {
+      display: none;
+    }
+    .mobile-menu-btn {
+      display: flex;
+    }
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-1);
+      padding: var(--space-3) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .nav-links.is-open {
+      display: flex;
+    }
+    .nav-link {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+    }
+  }
+</style>
+
+<script>
+  function setupNav() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const links = document.getElementById('nav-links');
+    toggle?.addEventListener('click', () => {
+      const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', (!isExpanded).toString());
+      links?.classList.toggle('is-open');
+    });
+  }
+  setupNav();
+  document.addEventListener('astro:page-load', setupNav);
+</script>

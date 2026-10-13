@@ -1,0 +1,332 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { WORKS } from '../../data/fixtures';
+---
+
+<BaseLayout 
+  title="Complete Library Archive & Search (पुस्तकालय संग्रह) — Antigravity Review"
+  description="Search and filter the complete bilingual catalog of poems, essays, short stories, aphorisms, and visual artworks."
+>
+  <div class="container page-container">
+    <header class="page-header">
+      <span class="badge badge-prose">Library & Catalog • सम्पूर्ण संग्रह</span>
+      <h1 class="page-title">Library Archives & Search</h1>
+      <p class="page-subtitle">
+        Explore our complete catalog of bilingual literature and visual art. Filter by medium, language, or search by keyword in English and Hindi.
+      </p>
+
+      <!-- Live Search & Filtering Controls -->
+      <div class="search-panel">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="search" 
+            id="archive-search-input" 
+            class="archive-search-input" 
+            placeholder="Search titles, themes, verses, or tags (e.g. मौन, solitude, twilight)..."
+            aria-label="Search works" 
+          />
+          <button type="button" id="search-clear-btn" class="search-clear-btn" aria-label="Clear search input" style="display: none;">
+            ✕
+          </button>
+        </div>
+
+        <div class="filter-controls-row">
+          <!-- Content Type Filter -->
+          <div class="filter-group">
+            <label for="filter-type" class="filter-label">Content Medium:</label>
+            <select id="filter-type" class="filter-select">
+              <option value="all">All Mediums ({WORKS.length})</option>
+              <option value="poem">Poetry / कविता</option>
+              <option value="story">Short Fiction / कथा</option>
+              <option value="essay">Essays / निबंध</option>
+              <option value="thought">Thoughts / विचार</option>
+              <option value="quote">Quotations / उद्धरण</option>
+              <option value="artwork">Visual Art / कला</option>
+            </select>
+          </div>
+
+          <!-- Language & Script Filter -->
+          <div class="filter-group">
+            <label for="filter-lang" class="filter-label">Language & Script:</label>
+            <select id="filter-lang" class="filter-select">
+              <option value="all">All Languages</option>
+              <option value="hi-Deva">हिंदी (देवनागरी)</option>
+              <option value="hi-Latn">Romanized Hindi</option>
+              <option value="en-Latn">English</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Results Counter -->
+        <div class="results-bar">
+          <span id="results-count" class="results-count">Showing {WORKS.length} works</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Works Grid -->
+    <div class="archive-grid" id="archive-grid">
+      {WORKS.map(work => (
+        <div 
+          class="archive-item" 
+          data-title={work.title.toLowerCase()}
+          data-excerpt={work.excerpt.toLowerCase()}
+          data-tags={work.tags.join(' ').toLowerCase()}
+          data-creator={work.creator.toLowerCase()}
+          data-type={work.contentType}
+          data-lang-script={`${work.language}-${work.script}`}
+        >
+          <WorkCard work={work} />
+        </div>
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div id="no-results" class="no-results-state" style="display: none;">
+      <span class="no-results-icon">✦</span>
+      <h3 class="no-results-title">No matching works found</h3>
+      <p class="no-results-desc">
+        We could not find any publications matching your query. Try clearing your search keyword or selecting a different language or content medium.
+      </p>
+      <button type="button" id="reset-filters-btn" class="btn btn-outline">
+        Reset All Filters
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-container {
+    padding-top: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-10);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-subtitle {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin-bottom: var(--space-8);
+    line-height: 1.6;
+  }
+
+  .search-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--space-4);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .archive-search-input {
+    width: 100%;
+    padding: 12px var(--space-12) 12px 48px;
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    transition: border-color 0.15s ease;
+  }
+
+  .archive-search-input:focus {
+    border-color: var(--accent-crimson);
+    outline: none;
+  }
+
+  .search-clear-btn {
+    position: absolute;
+    right: var(--space-4);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .filter-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .filter-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .filter-select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .results-bar {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-3);
+  }
+
+  .results-count {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .no-results-state {
+    text-align: center;
+    padding: var(--space-16) var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-8);
+  }
+
+  .no-results-icon {
+    font-size: 2rem;
+    color: var(--accent-gold);
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .no-results-title {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-2);
+  }
+
+  .no-results-desc {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin-inline: auto;
+    margin-bottom: var(--space-6);
+  }
+</style>
+
+<script>
+  function setupArchiveSearch() {
+    const searchInput = document.getElementById('archive-search-input') as HTMLInputElement | null;
+    const clearBtn = document.getElementById('search-clear-btn');
+    const typeSelect = document.getElementById('filter-type') as HTMLSelectElement | null;
+    const langSelect = document.getElementById('filter-lang') as HTMLSelectElement | null;
+    const resultsCount = document.getElementById('results-count');
+    const items = document.querySelectorAll<HTMLElement>('.archive-item');
+    const noResults = document.getElementById('no-results');
+    const resetBtn = document.getElementById('reset-filters-btn');
+
+    function filterWorks() {
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      const selectedType = typeSelect?.value || 'all';
+      const selectedLang = langSelect?.value || 'all';
+
+      if (clearBtn) {
+        clearBtn.style.display = query ? 'block' : 'none';
+      }
+
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const title = item.getAttribute('data-title') || '';
+        const excerpt = item.getAttribute('data-excerpt') || '';
+        const tags = item.getAttribute('data-tags') || '';
+        const creator = item.getAttribute('data-creator') || '';
+        const type = item.getAttribute('data-type') || '';
+        const langScript = item.getAttribute('data-lang-script') || '';
+
+        const matchesQuery = !query || 
+          title.includes(query) || 
+          excerpt.includes(query) || 
+          tags.includes(query) || 
+          creator.includes(query);
+
+        const matchesType = selectedType === 'all' || type === selectedType;
+        const matchesLang = selectedLang === 'all' || langScript === selectedLang;
+
+        if (matchesQuery && matchesType && matchesLang) {
+          item.style.display = 'block';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      if (resultsCount) {
+        resultsCount.textContent = `Showing ${visibleCount} of ${items.length} works`;
+      }
+
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
+
+    searchInput?.addEventListener('input', filterWorks);
+    typeSelect?.addEventListener('change', filterWorks);
+    langSelect?.addEventListener('change', filterWorks);
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      filterWorks();
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (typeSelect) typeSelect.value = 'all';
+      if (langSelect) langSelect.value = 'all';
+      filterWorks();
+    });
+  }
+
+  setupArchiveSearch();
+  document.addEventListener('astro:page-load', setupArchiveSearch);
+</script>

@@ -1,0 +1,349 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PUBLICATION_INFO } from '../data/fixtures';
+---
+
+<BaseLayout 
+  title="About the Publication & Editorial Policy — Antigravity Review"
+  description="The vision, creator profile, copyright and rights declaration policy, and reader privacy charter of the Antigravity Review."
+>
+  <div class="container about-page-container">
+    <header class="about-header">
+      <span class="badge badge-prose">Publication Manifesto • परिचय व नीति</span>
+      <h1 class="about-title">About Antigravity Review</h1>
+      <p class="about-subtitle">
+        {PUBLICATION_INFO.nameHi} — {PUBLICATION_INFO.tagline}
+      </p>
+    </header>
+
+    <div class="about-layout">
+      <!-- Table of Contents / Sidebar -->
+      <aside class="about-sidebar">
+        <nav class="about-toc" aria-label="About page sections">
+          <span class="toc-title">On This Page</span>
+          <ul>
+            <li><a href="#manifesto">1. The Literary Manifesto</a></li>
+            <li><a href="#creator">2. Creator & Editorial Direction</a></li>
+            <li><a href="#rights-policy">3. Rights & Provenance Policy</a></li>
+            <li><a href="#privacy-policy">4. Reader Privacy Charter</a></li>
+            <li><a href="#contact">5. Editorial Contact</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Document Body -->
+      <main class="about-content">
+        <!-- 1. The Manifesto -->
+        <section id="manifesto" class="about-section">
+          <h2>1. The Literary Manifesto</h2>
+          <div class="prose-content">
+            <p>
+              In an age dominated by transient feeds, algorithmic acceleration, and superficial brevity, 
+              <strong>Antigravity Review</strong> was founded as an intentional sanctuary for contemplative reading.
+            </p>
+            <p>
+              We believe that literary and visual works demand an environment of quiet dignity. Typography is not merely 
+              a vehicle for data; it is an architectural space where thought breathes. By bringing the classical and modern 
+              traditions of Hindi literature together with English poetry and essays, we cultivate a bilingual resonance that 
+              honours both traditions without flattening their distinctive cadences.
+            </p>
+            <p lang="hi" class="hindi-quote-callout">
+              "साहित्य केवल शब्दों का विन्यास नहीं है; यह उस अंतःकरण की खोज है जहाँ मौन और अभिव्यक्ति एक दूसरे में विलीन हो जाते हैं।"
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Creator Profile -->
+        <section id="creator" class="about-section">
+          <h2>2. Creator & Editorial Direction</h2>
+          <div class="creator-profile-card">
+            <div class="creator-avatar">✦</div>
+            <div class="creator-bio">
+              <h3>{PUBLICATION_INFO.editor} <small>({PUBLICATION_INFO.editorHi})</small></h3>
+              <p class="creator-role">Founder, Primary Editor & Visual Artist</p>
+              <p class="creator-text">
+                {PUBLICATION_INFO.editor} is a writer, poet, and visual artist exploring bilingual aesthetics, classical Devanagari calligraphic forms, and meditative short fiction. All public curation, editorial selections, and original artworks featured on this publication are guided directly by the creator.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Rights & Provenance Policy -->
+        <section id="rights-policy" class="about-section">
+          <h2>3. Rights & Provenance Policy</h2>
+          <div class="policy-card">
+            <div class="policy-alert">
+              <strong>✦ Transparent Legal Boundary Notice:</strong>
+              <p>
+                Declarations of original authorship on this website reflect creator-declared claims of originality. In accordance with honest publication ethics, we make no representation that digital timestamps or upload records constitute independent legal copyright certification or statutory guarantee of enforceability.
+              </p>
+            </div>
+
+            <div class="prose-content">
+              <h3>Original Works</h3>
+              <p>
+                Unless explicitly marked otherwise, all poems, essays, short fiction, original thoughts, and visual artworks published under the attribution of {PUBLICATION_INFO.editor} are original works declared by the creator. All rights are reserved. No part of these works may be reproduced, distributed, scraped for commercial AI model training, or adapted without prior written permission.
+              </p>
+
+              <h3>Attributed Quotations & Public Domain Material</h3>
+              <p>
+                Where classical poetry, historical excerpts, or philosophical quotations appear, they are explicitly categorized as <em>Attributed Citations</em> with verified historical attribution, work titles, and links to source editions. Such material is presented under fair dealing for criticism, review, and literary study.
+              </p>
+
+              <h3>Evidence & Privacy Separation</h3>
+              <p>
+                Private archival notes, personal draft histories, and confidential ownership documents are kept strictly segregated from the public web server and public media repositories. No confidential personal records are ever hosted on public CDNs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Reader Privacy Charter -->
+        <section id="privacy-policy" class="about-section">
+          <h2>4. Reader Privacy Charter</h2>
+          <div class="prose-content">
+            <p>
+              Your reading habits belong entirely to you. We hold a strict stance on reader privacy:
+            </p>
+            <ul class="privacy-list">
+              <li>
+                <strong>Zero Commercial Trackers:</strong> We do not employ third-party analytics trackers, advertising pixels, or behavioral profiling tools.
+              </li>
+              <li>
+                <strong>Private Client-Side Preferences:</strong> Your selected reading theme (Light, Dark, Sepia) and font size adjustments are saved strictly inside your own browser's <code>localStorage</code>. They are never transmitted to our servers or shared across visitors.
+              </li>
+              <li>
+                <strong>No Mandatory Accounts:</strong> Readers can explore the entirety of our published library without registration, email verification, or tracking paywalls.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 5. Editorial Contact -->
+        <section id="contact" class="about-section">
+          <h2>5. Editorial Contact</h2>
+          <div class="prose-content">
+            <p>
+              For literary inquiries, permission requests, or academic citation clearances, please reach out to the editor:
+            </p>
+            <div class="contact-box">
+              <span class="contact-label">Editorial Inquiries:</span>
+              <a href="mailto:editor@antigravityreview.org" class="contact-email">editor@antigravityreview.org</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-page-container {
+    padding-top: var(--space-8);
+  }
+
+  .about-header {
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .about-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .about-subtitle {
+    font-family: var(--font-display-hi);
+    font-size: var(--text-lg);
+    color: var(--accent-crimson);
+  }
+
+  .about-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--space-12);
+  }
+
+  .about-sidebar {
+    position: sticky;
+    top: var(--space-8);
+    align-self: start;
+  }
+
+  .about-toc {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .toc-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  .about-toc ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .about-toc a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.15s ease;
+  }
+
+  .about-toc a:hover {
+    color: var(--accent-crimson);
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-width: 760px;
+  }
+
+  .about-section {
+    scroll-margin-top: var(--space-8);
+  }
+
+  .about-section h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-2);
+  }
+
+  .hindi-quote-callout {
+    font-family: var(--font-prose-hi);
+    font-size: var(--text-lg);
+    line-height: 1.8;
+    color: var(--accent-crimson);
+    border-left: 3px solid var(--accent-crimson);
+    padding-left: var(--space-4);
+    margin-block: var(--space-4);
+  }
+
+  .creator-profile-card {
+    display: flex;
+    gap: var(--space-6);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .creator-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--bg-subtle);
+    color: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .creator-role {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--accent-crimson);
+    margin-bottom: var(--space-2);
+  }
+
+  .creator-text {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .policy-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+  }
+
+  .policy-alert {
+    background-color: var(--bg-subtle);
+    border-left: 4px solid var(--accent-gold);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-bottom: var(--space-6);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .policy-alert strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: var(--space-1);
+  }
+
+  .privacy-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .privacy-list li {
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--accent-indigo);
+    font-size: var(--text-sm);
+  }
+
+  .contact-box {
+    margin-top: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .contact-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .contact-email {
+    font-family: var(--font-masthead);
+    font-size: var(--text-base);
+    color: var(--accent-crimson);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .contact-email:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 860px) {
+    .about-layout {
+      grid-template-columns: 1fr;
+    }
+    .about-sidebar {
+      position: static;
+    }
+  }
+</style>

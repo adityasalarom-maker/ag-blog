@@ -1,0 +1,111 @@
+---
+// ThemeToggle.astro — Modern multi-theme switcher (Light, Dark, Sepia, System)
+---
+<div class="theme-switcher" role="group" aria-label="Reading theme selection">
+  <button type="button" class="theme-btn" data-set-theme="light" title="Light Theme (Parchment)" aria-label="Light theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <span class="theme-label">Light</span>
+  </button>
+
+  <button type="button" class="theme-btn" data-set-theme="sepia" title="Sepia Theme (Warm Papyrus)" aria-label="Sepia theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </svg>
+    <span class="theme-label">Sepia</span>
+  </button>
+
+  <button type="button" class="theme-btn" data-set-theme="dark" title="Dark Theme (Midnight Ink)" aria-label="Dark theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+    <span class="theme-label">Dark</span>
+  </button>
+</div>
+
+<style>
+  .theme-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 2px;
+  }
+
+  .theme-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .theme-btn:hover {
+    color: var(--text-primary);
+  }
+
+  .theme-btn.active {
+    background-color: var(--bg-surface);
+    color: var(--accent-crimson);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .theme-label {
+      display: none;
+    }
+    .theme-btn {
+      padding: 6px;
+    }
+  }
+</style>
+
+<script>
+  function setupThemeControls() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-set-theme]');
+    const currentTheme = localStorage.getItem('ag-theme') || 'light';
+
+    function updateActiveState(theme: string) {
+      buttons.forEach(btn => {
+        const isMatch = btn.getAttribute('data-set-theme') === theme;
+        btn.classList.toggle('active', isMatch);
+        btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+      });
+    }
+
+    updateActiveState(currentTheme);
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTheme = btn.getAttribute('data-set-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', targetTheme);
+        localStorage.setItem('ag-theme', targetTheme);
+        updateActiveState(targetTheme);
+      });
+    });
+  }
+
+  setupThemeControls();
+  document.addEventListener('astro:page-load', setupThemeControls);
+</script>

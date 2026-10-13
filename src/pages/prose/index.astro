@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { WORKS } from '../../data/fixtures';
+
+const proseWorks = WORKS.filter(w => w.contentType === 'story' || w.contentType === 'essay');
+---
+
+<BaseLayout 
+  title="Stories & Essays (कथा व निबंध) — Antigravity Review"
+  description="Immersive long-form fiction, literary essays, and philosophical reflections in English and Hindi."
+>
+  <div class="container page-container">
+    <header class="page-header">
+      <span class="badge badge-prose">Narratives & Critical Thought • गद्य विमर्श</span>
+      <h1 class="page-title">Stories & Essays</h1>
+      <p class="page-subtitle">
+        Long-form contemplation, character studies, archival fiction, and essays exploring the silence behind the word.
+      </p>
+
+      <div class="filter-bar" role="toolbar" aria-label="Filter prose by genre">
+        <button type="button" class="filter-btn active" data-filter="all">All Prose ({proseWorks.length})</button>
+        <button type="button" class="filter-btn" data-filter="story">Short Stories / कथा</button>
+        <button type="button" class="filter-btn" data-filter="essay">Essays & Critical Thought / निबंध</button>
+      </div>
+    </header>
+
+    <div class="prose-grid" id="prose-grid">
+      {proseWorks.map(work => (
+        <div class="prose-item" data-type={work.contentType}>
+          <WorkCard work={work} />
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-container {
+    padding-top: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-subtitle {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    max-width: 650px;
+    margin-bottom: var(--space-6);
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 6px 16px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  .filter-btn.active {
+    background-color: var(--text-primary);
+    color: var(--bg-page);
+    border-color: var(--text-primary);
+  }
+
+  .prose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: var(--space-8);
+  }
+</style>
+
+<script>
+  function setupProseFilters() {
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const items = document.querySelectorAll<HTMLElement>('.prose-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        items.forEach(item => {
+          const type = item.getAttribute('data-type');
+          if (filter === 'all' || type === filter) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+
+  setupProseFilters();
+  document.addEventListener('astro:page-load', setupProseFilters);
+</script>

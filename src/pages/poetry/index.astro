@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { WORKS } from '../../data/fixtures';
+
+const poems = WORKS.filter(w => w.contentType === 'poem');
+---
+
+<BaseLayout 
+  title="Poetry Anthology (कविता संग्रह) — Antigravity Review"
+  description="Contemplative bilingual verses in Hindi (Devanagari) and English, exploring memory, solitude, time, and philosophical horizons."
+>
+  <div class="container page-container">
+    <header class="page-header">
+      <span class="badge badge-poetry">Anthology • कविता वीथिका</span>
+      <h1 class="page-title">Poetry Anthology</h1>
+      <p class="page-subtitle">
+        Preserving the cadence, line rhythm, and typographic dignity of verses in Hindi and English.
+      </p>
+
+      <!-- Filter Controls -->
+      <div class="filter-bar" role="toolbar" aria-label="Filter poetry by language">
+        <button type="button" class="filter-btn active" data-filter="all">All Verses ({poems.length})</button>
+        <button type="button" class="filter-btn" data-filter="hi">हिंदी (देवनागरी)</button>
+        <button type="button" class="filter-btn" data-filter="en">English Verses</button>
+        <button type="button" class="filter-btn" data-filter="bilingual">Bilingual Editions</button>
+      </div>
+    </header>
+
+    <div class="poetry-grid" id="poetry-grid">
+      {poems.map(poem => {
+        const isBilingual = !!poem.translatedEditionSlug;
+        return (
+          <div class="poetry-item" data-lang={poem.language} data-bilingual={isBilingual ? 'true' : 'false'}>
+            <WorkCard work={poem} />
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-container {
+    padding-top: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-subtitle {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    max-width: 650px;
+    margin-bottom: var(--space-6);
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 6px 16px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  .filter-btn.active {
+    background-color: var(--text-primary);
+    color: var(--bg-page);
+    border-color: var(--text-primary);
+  }
+
+  .poetry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-6);
+  }
+</style>
+
+<script>
+  function setupPoetryFilters() {
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const items = document.querySelectorAll<HTMLElement>('.poetry-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        items.forEach(item => {
+          const lang = item.getAttribute('data-lang');
+          const isBilingual = item.getAttribute('data-bilingual') === 'true';
+
+          if (filter === 'all') {
+            item.style.display = 'block';
+          } else if (filter === 'bilingual') {
+            item.style.display = isBilingual ? 'block' : 'none';
+          } else {
+            item.style.display = lang === filter ? 'block' : 'none';
+          }
+        });
+      });
+    });
+  }
+
+  setupPoetryFilters();
+  document.addEventListener('astro:page-load', setupPoetryFilters);
+</script>

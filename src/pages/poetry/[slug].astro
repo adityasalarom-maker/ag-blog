@@ -1,0 +1,393 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import { WORKS, type Work } from '../../data/fixtures';
+
+export function getStaticPaths() {
+  const poems = WORKS.filter(w => w.contentType === 'poem');
+  return poems.map(poem => ({
+    params: { slug: poem.slug },
+    props: { poem }
+  }));
+}
+
+interface Props {
+  poem: Work;
+}
+
+const { poem } = Astro.props;
+const isHi = poem.language === 'hi' && poem.script === 'Deva';
+
+// Break body into distinct stanzas (delimited by double newlines)
+const stanzas = poem.body ? poem.body.split(/\n\s*\n/) : [];
+
+// Find companion translation if available
+const companionWork = poem.translatedEditionSlug 
+  ? WORKS.find(w => w.slug === poem.translatedEditionSlug)
+  : null;
+---
+
+<BaseLayout 
+  title={`${poem.title} — Poetry by ${poem.creator} | Antigravity Review`}
+  description={poem.excerpt}
+  image={poem.coverImage}
+  lang={poem.language}
+  type="article"
+>
+  <div class="container poem-page-container">
+    <!-- Breadcrumb & Navigation -->
+    <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+      <a href="/">Front Page</a>
+      <span class="sep">/</span>
+      <a href="/poetry">Poetry Anthology</a>
+      <span class="sep">/</span>
+      <span class="current" aria-current="page">{poem.title}</span>
+    </nav>
+
+    <!-- Poem Header -->
+    <header class="poem-header">
+      <div class="poem-badge-row">
+        <span class="badge badge-poetry">Poem • कविता</span>
+        <span class="script-tag">
+          {isHi ? 'हिंदी (देवनागरी लिपि)' : poem.language === 'hi' ? 'Romanized Hindi' : 'English Verse'}
+        </span>
+      </div>
+
+      <h1 class="poem-title" lang={isHi ? 'hi' : 'en'}>{poem.title}</h1>
+
+      <div class="poem-byline">
+        <span class="creator-label">By</span>
+        <strong class="creator-name">{poem.creator}</strong>
+        <span class="bullet">•</span>
+        <time datetime={poem.publishedAt}>
+          {new Date(poem.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </time>
+      </div>
+
+      <!-- Action Row: Share & Reader Preference reminder -->
+      <div class="poem-actions">
+        <ShareButton title={`${poem.title} — Poem by ${poem.creator}`} />
+      </div>
+    </header>
+
+    <!-- Companion Translation Card (Bilingual Feature) -->
+    {companionWork && (
+      <aside class="bilingual-companion-banner" aria-label="Available translation">
+        <div class="companion-icon">⇄</div>
+        <div class="companion-text">
+          <span class="companion-label">Linked Bilingual Edition Available:</span>
+          <a href={`/poetry/${companionWork.slug}`} class="companion-link">
+            {companionWork.title} ({companionWork.language === 'hi' ? 'हिंदी संस्करण' : 'English Edition'}) →
+          </a>
+        </div>
+      </aside>
+    )}
+
+    <!-- Main Poem Reading Canvas (Preserving Stanzas & Line Breaks) -->
+    <main class="poem-reading-area">
+      <article class="poem-canvas" lang={isHi ? 'hi' : 'en'}>
+        {stanzas.map((stanza, index) => (
+          <div class="poem-stanza" data-stanza-index={index + 1}>
+            <p class="poem-verse" lang={isHi ? 'hi' : 'en'}>{stanza}</p>
+          </div>
+        ))}
+      </article>
+    </main>
+
+    <!-- Companion Artwork if attached -->
+    {poem.coverImage && (
+      <section class="companion-art-section">
+        <h2 class="art-section-heading">Visual Companion • चित्रात्मक समन्वय</h2>
+        <div class="companion-art-card">
+          <img 
+            src={poem.coverImage} 
+            alt={poem.coverAlt} 
+            class="companion-art-img"
+            data-artwork-trigger
+            data-img-src={poem.coverImage}
+            data-title={poem.coverAlt || poem.title}
+            data-artist={poem.creator}
+            data-medium="Archival Artwork"
+            data-dimensions="Original Resolution"
+            data-year="2026"
+            data-caption={poem.excerpt}
+            data-rights={poem.rights.notice}
+          />
+          <div class="companion-art-footer">
+            <p class="art-alt-text">{poem.coverAlt}</p>
+            <button 
+              type="button" 
+              class="btn btn-outline"
+              data-artwork-trigger
+              data-img-src={poem.coverImage}
+              data-title={poem.coverAlt || poem.title}
+              data-artist={poem.creator}
+              data-medium="Archival Artwork"
+              data-dimensions="Original Resolution"
+              data-year="2026"
+              data-caption={poem.excerpt}
+              data-rights={poem.rights.notice}
+            >
+              🔍 Examine Artwork in Lightbox
+            </button>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Rights & Provenance Section -->
+    <section class="poem-rights-section">
+      <div class="rights-card">
+        <h3 class="rights-title">Rights & Attribution Declaration</h3>
+        <p class="rights-desc">{poem.rights.notice}</p>
+        <div class="rights-meta">
+          <span><strong>Declared By:</strong> {poem.rights.declaredBy}</span>
+          <span><strong>Declaration Status:</strong> {poem.rights.status}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Return to Anthology -->
+    <div class="poem-bottom-nav">
+      <a href="/poetry" class="btn btn-outline">← Back to Poetry Anthology</a>
+      <a href="/archive" class="btn btn-outline">Explore All Works →</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .poem-page-container {
+    max-width: 800px;
+    padding-top: var(--space-6);
+  }
+
+  .breadcrumb {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--accent-crimson);
+  }
+
+  .sep {
+    color: var(--border-strong);
+  }
+
+  .current {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .poem-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: var(--space-8);
+  }
+
+  .poem-badge-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .script-tag {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .poem-title {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    line-height: 1.2;
+    margin-bottom: var(--space-3);
+  }
+
+  .poem-title[lang="hi"] {
+    font-family: var(--font-display-hi);
+    line-height: 1.35;
+  }
+
+  .poem-byline {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+
+  .bullet {
+    color: var(--border-strong);
+  }
+
+  .poem-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Bilingual Translation Banner */
+  .bilingual-companion-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-12);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .companion-icon {
+    font-size: 1.5rem;
+    color: var(--accent-gold);
+  }
+
+  .companion-label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .companion-link {
+    font-family: var(--font-masthead);
+    font-size: var(--text-base);
+    color: var(--accent-crimson);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .companion-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Reading Canvas */
+  .poem-reading-area {
+    margin-bottom: var(--space-16);
+  }
+
+  .poem-canvas {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: clamp(var(--space-8), 6vw, var(--space-16)) clamp(var(--space-6), 6vw, var(--space-12));
+    box-shadow: var(--shadow-card);
+  }
+
+  .poem-stanza {
+    margin-bottom: var(--space-8);
+  }
+
+  .poem-stanza:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Companion Artwork */
+  .companion-art-section {
+    margin-bottom: var(--space-16);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-8);
+  }
+
+  .art-section-heading {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .companion-art-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .companion-art-img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+  }
+
+  .companion-art-footer {
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    background-color: var(--bg-page);
+  }
+
+  .art-alt-text {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* Rights */
+  .poem-rights-section {
+    margin-bottom: var(--space-12);
+  }
+
+  .rights-card {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    font-size: var(--text-xs);
+  }
+
+  .rights-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .rights-desc {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .rights-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    color: var(--text-muted);
+  }
+
+  .poem-bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-6);
+  }
+
+  @media (max-width: 600px) {
+    .companion-art-footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .poem-bottom-nav {
+      flex-direction: column;
+    }
+  }
+</style>

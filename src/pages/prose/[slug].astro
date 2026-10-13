@@ -1,0 +1,373 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import { WORKS, type Work } from '../../data/fixtures';
+
+export function getStaticPaths() {
+  const proseWorks = WORKS.filter(w => w.contentType === 'story' || w.contentType === 'essay');
+  return proseWorks.map(work => ({
+    params: { slug: work.slug },
+    props: { work }
+  }));
+}
+
+interface Props {
+  work: Work;
+}
+
+const { work } = Astro.props;
+const isHi = work.language === 'hi' && work.script === 'Deva';
+
+// Split paragraphs
+const paragraphs = work.body ? work.body.split(/\n\s*\n/) : [];
+---
+
+<BaseLayout 
+  title={`${work.title} — ${work.contentType === 'story' ? 'Short Fiction' : 'Essay'} by ${work.creator} | Antigravity Review`}
+  description={work.excerpt}
+  image={work.coverImage}
+  lang={work.language}
+  type="article"
+>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress-track" aria-hidden="true">
+    <div class="reading-progress-bar" id="reading-progress-bar"></div>
+  </div>
+
+  <div class="container prose-page-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+      <a href="/">Front Page</a>
+      <span class="sep">/</span>
+      <a href="/prose">Stories & Essays</a>
+      <span class="sep">/</span>
+      <span class="current" aria-current="page">{work.title}</span>
+    </nav>
+
+    <!-- Header Article Meta -->
+    <header class="prose-header">
+      <div class="prose-badge-row">
+        <span class="badge badge-prose">
+          {work.contentType === 'story' ? 'Fiction / कथा' : 'Essay / निबंध'}
+        </span>
+        <span class="lang-tag">
+          {isHi ? 'हिंदी (देवनागरी)' : 'English Literary Prose'}
+        </span>
+      </div>
+
+      <h1 class="prose-title" lang={isHi ? 'hi' : 'en'}>{work.title}</h1>
+
+      <p class="prose-lead-excerpt" lang={isHi ? 'hi' : 'en'}>
+        {work.excerpt}
+      </p>
+
+      <div class="prose-byline">
+        <div class="byline-author">
+          <span class="author-prefix">Written by</span>
+          <strong class="author-name">{work.creator}</strong>
+        </div>
+        <div class="byline-meta">
+          <time datetime={work.publishedAt}>
+            {new Date(work.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </time>
+          <span class="bullet">•</span>
+          <span>{work.readingTimeMinutes} min read</span>
+        </div>
+      </div>
+
+      <!-- Action Row -->
+      <div class="prose-share-row">
+        <ShareButton title={`${work.title} by ${work.creator}`} />
+      </div>
+    </header>
+
+    <!-- Hero Image if present -->
+    {work.coverImage && (
+      <figure class="prose-hero-media">
+        <img 
+          src={work.coverImage} 
+          alt={work.coverAlt || work.title} 
+          class="prose-hero-img"
+          data-artwork-trigger
+          data-img-src={work.coverImage}
+          data-title={work.coverAlt || work.title}
+          data-artist={work.creator}
+          data-medium="Featured Artwork"
+          data-dimensions="High Resolution"
+          data-year="2026"
+          data-caption={work.excerpt}
+          data-rights={work.rights.notice}
+        />
+        {work.coverAlt && (
+          <figcaption class="prose-hero-caption">{work.coverAlt}</figcaption>
+        )}
+      </figure>
+    )}
+
+    <!-- Main Prose Reading Canvas -->
+    <article class="prose-reading-body">
+      <div class="prose-content" lang={isHi ? 'hi' : 'en'}>
+        {paragraphs.map((para, index) => (
+          <p class={index === 0 && !isHi ? 'drop-cap' : ''}>{para}</p>
+        ))}
+      </div>
+    </article>
+
+    <!-- Author & Provenance Box -->
+    <section class="author-bio-box">
+      <div class="bio-avatar">✦</div>
+      <div class="bio-content">
+        <h3 class="bio-name">{work.creator}</h3>
+        <p class="bio-text">
+          Writer, editor, and visual artist exploring bilingual aesthetics, interior landscapes, and contemplative literature in the Antigravity Review.
+        </p>
+        <div class="bio-rights">
+          <strong>Rights Notice:</strong> {work.rights.notice}
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <div class="prose-bottom-nav">
+      <a href="/prose" class="btn btn-outline">← Back to Stories & Essays</a>
+      <a href="/archive" class="btn btn-outline">Browse Complete Archive →</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Reading Progress Bar */
+  .reading-progress-track {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: transparent;
+    z-index: 1000;
+  }
+
+  .reading-progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--accent-crimson);
+    transition: width 0.1s ease-out;
+  }
+
+  .prose-page-container {
+    max-width: 820px;
+    padding-top: var(--space-6);
+  }
+
+  .breadcrumb {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--accent-crimson);
+  }
+
+  .sep {
+    color: var(--border-strong);
+  }
+
+  .current {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .prose-header {
+    margin-bottom: var(--space-10);
+  }
+
+  .prose-badge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .lang-tag {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .prose-title {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    line-height: 1.2;
+    margin-bottom: var(--space-4);
+  }
+
+  .prose-title[lang="hi"] {
+    font-family: var(--font-display-hi);
+    line-height: 1.35;
+  }
+
+  .prose-lead-excerpt {
+    font-family: var(--font-prose-en);
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: var(--space-6);
+  }
+
+  .prose-lead-excerpt[lang="hi"] {
+    font-family: var(--font-prose-hi);
+    line-height: 1.8;
+  }
+
+  .prose-byline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .byline-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .author-name {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+  }
+
+  .byline-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .bullet {
+    color: var(--border-strong);
+  }
+
+  .prose-share-row {
+    margin-bottom: var(--space-8);
+  }
+
+  .prose-hero-media {
+    margin-bottom: var(--space-12);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface);
+  }
+
+  .prose-hero-img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+  }
+
+  .prose-hero-caption {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    font-style: italic;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .prose-reading-body {
+    margin-bottom: var(--space-16);
+  }
+
+  .author-bio-box {
+    display: flex;
+    gap: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin-bottom: var(--space-12);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .bio-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--bg-subtle);
+    color: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .bio-name {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-1);
+  }
+
+  .bio-text {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-3);
+  }
+
+  .bio-rights {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-2);
+  }
+
+  .prose-bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-6);
+  }
+
+  @media (max-width: 600px) {
+    .author-bio-box {
+      flex-direction: column;
+    }
+    .prose-bottom-nav {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  function setupReadingProgress() {
+    const progressBar = document.getElementById('reading-progress-bar');
+    if (!progressBar) return;
+
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      progressBar.style.width = `${scrolled}%`;
+    });
+  }
+
+  setupReadingProgress();
+  document.addEventListener('astro:page-load', setupReadingProgress);
+</script>
