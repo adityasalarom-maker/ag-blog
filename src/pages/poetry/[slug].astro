@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShareButton from '../../components/ShareButton.astro';
+import ZenModeToggle from '../../components/ZenModeToggle.astro';
 import WorkCard from '../../components/WorkCard.astro';
 import { WORKS, type Work } from '../../data/fixtures';
 import { getRelatedWorks } from '../../lib/content/relatedWorks.ts';
@@ -106,6 +107,7 @@ const relatedWorks = getRelatedWorks(poem, 3);
 
       <!-- Action Row: Share & Reader Preference reminder -->
       <div class="poem-actions">
+        <ZenModeToggle />
         <ShareButton title={`${poem.title} — Poem by ${poem.creator}`} />
       </div>
     </header>
@@ -291,6 +293,9 @@ const relatedWorks = getRelatedWorks(poem, 3);
   .poem-actions {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
   }
 
   /* Bilingual Translation Banner */

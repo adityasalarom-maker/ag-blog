@@ -1,0 +1,124 @@
+---
+// ZenModeToggle.astro — Distraction-Free Calm Reading Mode (शांत पठन)
+---
+<div class="zen-toggle-wrap">
+  <button type="button" class="btn btn-outline zen-btn" id="zen-mode-toggle" title="Toggle Distraction-Free Zen Reading Mode (Press Z)" aria-label="Toggle Zen Reading Mode">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="4"></circle>
+      <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+      <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+      <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+      <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+    </svg>
+    <span class="zen-btn-text">Zen Mode • शांत पठन</span>
+  </button>
+
+  <!-- Floating Exit Zen Button (Visible only when in Zen Mode) -->
+  <button type="button" class="floating-exit-zen" id="zen-mode-exit" title="Exit Zen Mode (Esc or Z)" aria-label="Exit Zen Mode">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+    <span>Exit Zen Mode (Esc)</span>
+  </button>
+</div>
+
+<style>
+  .zen-toggle-wrap {
+    display: inline-block;
+  }
+
+  .zen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 6px 14px;
+    border-color: var(--border-subtle);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .zen-btn:hover {
+    color: var(--accent-gold);
+    border-color: var(--accent-gold);
+    background-color: var(--bg-surface);
+  }
+
+  /* Floating Exit Button */
+  .floating-exit-zen {
+    position: fixed;
+    bottom: var(--space-6);
+    right: var(--space-6);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    box-shadow: var(--shadow-card);
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    z-index: 9999;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+
+  .floating-exit-zen:hover {
+    background-color: var(--accent-crimson);
+    color: #ffffff;
+    border-color: var(--accent-crimson);
+  }
+
+  :global([data-zen-mode="true"]) .floating-exit-zen {
+    display: inline-flex;
+  }
+</style>
+
+<script>
+  function setupZenMode() {
+    const toggleBtn = document.getElementById('zen-mode-toggle');
+    const exitBtn = document.getElementById('zen-mode-exit');
+
+    function setZenMode(active: boolean) {
+      if (active) {
+        document.documentElement.setAttribute('data-zen-mode', 'true');
+      } else {
+        document.documentElement.removeAttribute('data-zen-mode');
+      }
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+      const isCurrentlyZen = document.documentElement.getAttribute('data-zen-mode') === 'true';
+      setZenMode(!isCurrentlyZen);
+    });
+
+    exitBtn?.addEventListener('click', () => {
+      setZenMode(false);
+    });
+
+    // Keyboard Shortcuts: 'z' to toggle Zen Mode, 'Escape' to exit
+    window.addEventListener('keydown', (e) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key === 'z' || e.key === 'Z') {
+        const isCurrentlyZen = document.documentElement.getAttribute('data-zen-mode') === 'true';
+        setZenMode(!isCurrentlyZen);
+      } else if (e.key === 'Escape') {
+        setZenMode(false);
+      }
+    });
+  }
+
+  setupZenMode();
+  document.addEventListener('astro:page-load', setupZenMode);
+</script>

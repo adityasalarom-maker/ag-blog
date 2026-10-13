@@ -352,6 +352,37 @@ dialog.artwork-modal::backdrop {
   backdrop-filter: blur(6px);
 }
 
+/* Zen Mode: Distraction-Free Literary Reading Canvas */
+[data-zen-mode="true"] .site-header,
+[data-zen-mode="true"] .site-footer,
+[data-zen-mode="true"] .breadcrumb,
+[data-zen-mode="true"] .poem-actions,
+[data-zen-mode="true"] .prose-share-row,
+[data-zen-mode="true"] .poem-bottom-nav,
+[data-zen-mode="true"] .prose-bottom-nav,
+[data-zen-mode="true"] .related-works-section,
+[data-zen-mode="true"] .poem-rights-section,
+[data-zen-mode="true"] .author-bio-box,
+[data-zen-mode="true"] .bilingual-companion-banner {
+  display: none !important;
+}
+
+[data-zen-mode="true"] .site-main {
+  padding-block: var(--space-16);
+  min-height: 100vh;
+}
+
+[data-zen-mode="true"] .poem-page-container,
+[data-zen-mode="true"] .prose-page-container {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+[data-zen-mode="true"] .poem-title,
+[data-zen-mode="true"] .prose-title {
+  text-align: center;
+}
+
 /* Reduced Motion Optimization */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
