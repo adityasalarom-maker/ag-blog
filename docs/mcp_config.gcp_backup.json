@@ -1,0 +1,26 @@
+{
+  "_comment": "Backup of Google Cloud Data Agent Kit MCP configuration. Restore to C:/Users/adity/.gemini/config/mcp_config.json when working on BigQuery/DataCloud projects.",
+  "mcpServers": {
+    "notebooks": {
+      "command": "node",
+      "args": [
+        "c:\\Users\\adity\\.antigravity-ide\\extensions\\googlecloudtools.datacloud-1.1.0-universal\\mcp_servers\\cli\\mcp_proxy_bundle.js",
+        "notebooks-antigravityide"
+      ]
+    },
+    "visualization": {
+      "command": "node",
+      "args": [
+        "c:\\Users\\adity\\.antigravity-ide\\extensions\\googlecloudtools.datacloud-1.1.0-universal\\mcp_servers\\cli\\mcp_proxy_bundle.js",
+        "visualization-antigravityide"
+      ]
+    },
+    "data-agent-kit": {
+      "command": "node",
+      "args": [
+        "c:\\Users\\adity\\.antigravity-ide\\extensions\\googlecloudtools.datacloud-1.1.0-universal\\mcp_servers\\cli\\mcp_proxy_bundle.js",
+        "dataAgentKit-antigravityide"
+      ]
+    }
+  }
+}

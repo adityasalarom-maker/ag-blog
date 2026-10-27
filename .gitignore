@@ -17,3 +17,6 @@ Thumbs.db
 # Ephemeral test backups
 data/backups/
 
+# Portable tools
+cloudflared.exe
+

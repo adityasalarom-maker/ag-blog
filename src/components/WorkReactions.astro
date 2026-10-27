@@ -8,7 +8,12 @@ interface Props {
 const { workId, workTitle, isHindi = false } = Astro.props;
 ---
 
-<section class="work-reactions-section" aria-label={isHindi ? 'रचना प्रतिक्रियाएं' : 'Work Reactions'} data-work-id={workId}>
+<section 
+  class="work-reactions-section" 
+  aria-label={isHindi ? `"${workTitle}" पर प्रतिक्रियाएं` : `Reactions for "${workTitle}"`} 
+  data-work-id={workId}
+  data-work-title={workTitle}
+>
   <div class="reactions-container">
     <div class="reactions-intro">
       <span class="reactions-prompt">

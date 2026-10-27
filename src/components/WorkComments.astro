@@ -13,6 +13,7 @@ const { workId, workTitle, isHindi = false } = Astro.props;
   id="comments-section" 
   aria-label={isHindi ? 'पाठक टिप्पणियाँ व संवाद' : 'Reader Comments & Discussion'}
   data-work-id={workId}
+  data-work-title={workTitle}
 >
   <div class="comments-header">
     <div class="comments-title-row">
@@ -388,8 +389,9 @@ const { workId, workTitle, isHindi = false } = Astro.props;
   function setupComments() {
     const sections = document.querySelectorAll('.work-comments-section');
     sections.forEach(section => {
-      const workId = section.getAttribute('data-work-id');
-      if (!workId) return;
+      const rawWorkId = section.getAttribute('data-work-id');
+      if (!rawWorkId) return;
+      const workId: string = rawWorkId;
 
       const badge = section.querySelector(`#comments-badge-${workId}`);
       const feed = section.querySelector(`#feed-${workId}`);

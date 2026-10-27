@@ -16,6 +16,7 @@ const urls = [
   '/collections/monsoon-melancholy',
   '/collections/thresholds-of-becoming',
   '/archive',
+  '/community',
   '/about'
 ];
 

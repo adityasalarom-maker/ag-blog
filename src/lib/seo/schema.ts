@@ -45,10 +45,10 @@ export function getArticleSchema(work: Work, canonicalUrl: string) {
     '@context': 'https://schema.org',
     '@type': work.contentType === 'poem' ? ['CreativeWork', 'Article'] : 'Article',
     headline: work.title,
-    description: work.excerpt || work.summary,
+    description: work.excerpt,
     inLanguage: work.language,
     datePublished: work.publishedAt,
-    dateModified: work.modifiedAt || work.publishedAt,
+    dateModified: work.updatedAt || work.publishedAt,
     author: {
       '@type': 'Person',
       name: work.creator
@@ -76,9 +76,9 @@ export function getVisualArtworkSchema(artwork: Work, canonicalUrl: string) {
       name: artwork.creator
     },
     artMedium: artwork.artworkDetails?.medium || 'Visual Art',
-    description: artwork.excerpt || artwork.summary,
+    description: artwork.excerpt,
     image: artwork.coverImage ? `${SITE_URL}${artwork.coverImage}` : undefined,
-    dateCreated: artwork.artworkDetails?.year ? artwork.artworkDetails.year.toString() : undefined,
+    dateCreated: artwork.artworkDetails?.yearCreated ? artwork.artworkDetails.yearCreated.toString() : undefined,
     url: canonicalUrl
   };
 }
@@ -92,7 +92,11 @@ export function getQuotationSchema(quote: Work, canonicalUrl: string) {
       '@type': 'Person',
       name: quote.creator
     },
-    citation: quote.quoteSource?.sourceTitle || quote.quoteSource?.sourceAuthor,
+    citation: quote.quoteSource 
+      ? (quote.quoteSource.workTitle 
+          ? `${quote.quoteSource.workTitle}${quote.quoteSource.author ? ` by ${quote.quoteSource.author}` : ''}` 
+          : quote.quoteSource.author) 
+      : undefined,
     url: canonicalUrl
   };
 }

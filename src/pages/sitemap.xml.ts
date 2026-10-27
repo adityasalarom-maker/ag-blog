@@ -42,7 +42,7 @@ export const GET: APIRoute = async ({ site }) => {
     if (!workPath) continue;
 
     const workUrl = `${baseUrl}${workPath}`;
-    const lastMod = work.modifiedAt || work.publishedAt;
+    const lastMod = work.updatedAt || work.publishedAt;
 
     xml += `  <url>\n`;
     xml += `    <loc>${workUrl}</loc>\n`;

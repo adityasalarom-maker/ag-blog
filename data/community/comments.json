@@ -32,5 +32,39 @@
     "likeCount": 0,
     "replyCount": 0,
     "createdAt": "2026-10-13T23:43:05.285Z"
+  },
+  {
+    "id": "cmt_1791966932190_05cb99fe",
+    "workId": "poem-hi-01",
+    "parentCommentId": null,
+    "authorName": "Aarav Sharma",
+    "authorEmail": "aarav@example.com",
+    "content": "A deeply contemplative poem. The rhythm between silence and memory resonates powerfully.",
+    "status": "approved",
+    "likeCount": 1,
+    "replyCount": 1,
+    "createdAt": "2026-10-14T08:35:32.190Z"
+  },
+  {
+    "id": "cmt_1791966932200_5e08fef9",
+    "workId": "poem-hi-01",
+    "parentCommentId": "cmt_1791966932190_05cb99fe",
+    "authorName": "Priya Verma",
+    "content": "I agree completely, especially the second stanza in Devanagari.",
+    "status": "approved",
+    "likeCount": 0,
+    "replyCount": 0,
+    "createdAt": "2026-10-14T08:35:32.200Z"
+  },
+  {
+    "id": "cmt_1791966932213_442bcdda",
+    "workId": "poem-hi-01",
+    "parentCommentId": null,
+    "authorName": "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;Hacker",
+    "content": "Hello &lt;img src=x onerror=alert(1)&gt; and &lt;b&gt;bold&lt;/b&gt;",
+    "status": "approved",
+    "likeCount": 0,
+    "replyCount": 0,
+    "createdAt": "2026-10-14T08:35:32.213Z"
   }
 ]

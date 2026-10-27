@@ -2,7 +2,6 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import FontSizer from '../../../components/FontSizer.astro';
 import ThemeToggle from '../../../components/ThemeToggle.astro';
-import ArtworkModal from '../../../components/ArtworkModal.astro';
 import { verifyAdminAuth } from '../../../lib/auth/adminAuth.ts';
 import { getAdminWorkBySlug } from '../../../lib/content/adminService.ts';
 
@@ -230,8 +229,6 @@ const isHindi = work.language === 'hi' || work.script === 'Deva';
       )}
     </footer>
   </article>
-
-  <ArtworkModal />
 
   <style>
     /* Sticky Admin Banner */

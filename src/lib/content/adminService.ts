@@ -148,6 +148,7 @@ export function createWork(input: Partial<Work>): Work {
       status: 'Creator-Declared',
       notice: `© ${new Date().getFullYear()} ${input.creator || 'A. G. Varma'}. All rights reserved.`
     },
+    previousSlugs: input.previousSlugs || [],
     internalNotes: input.internalNotes
   };
 

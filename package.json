@@ -3,10 +3,13 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
+    "dev": "astro dev --host",
+    "start": "astro dev --host",
     "build": "astro build",
     "build:static": "astro build && node scripts/generate_static_search.mjs",
+    "check": "astro check",
+    "test": "node scripts/run_all_tests.mjs",
+    "tunnel": ".\\cloudflared.exe tunnel --url http://localhost:4321 --http-host-header localhost:4321",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -14,5 +17,10 @@
     "@astrojs/node": "^9.5.5",
     "@sanity/client": "^8.9.0",
     "astro": "^5.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.6.5",
+    "typescript": "^5.9.3"
   }
 }

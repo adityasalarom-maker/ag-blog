@@ -8,6 +8,7 @@ import WorkComments from '../../components/WorkComments.astro';
 import AuthorQueryModal from '../../components/AuthorQueryModal.astro';
 import { WORKS, type Work } from '../../data/fixtures';
 import { getRelatedWorks } from '../../lib/content/relatedWorks.ts';
+import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 export function getStaticPaths() {
   const proseWorks = WORKS.filter(w => w.contentType === 'story' || w.contentType === 'essay');
@@ -65,7 +66,6 @@ const companionPath = companionWork
 const relatedWorks = getRelatedWorks(work, 3);
 
 // Structured Data (JSON-LD)
-import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 const currentUrl = new URL(Astro.url.pathname, Astro.site || 'https://ag-literary-publication.pages.dev').toString();
 const proseSchemas = [
   getArticleSchema(work, currentUrl),

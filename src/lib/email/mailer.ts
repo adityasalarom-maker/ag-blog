@@ -113,7 +113,7 @@ export async function dispatchAuthorQuery(query: AuthorQuery): Promise<EmailDisp
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
-  const { subject, textBody } = formatAuthorQueryEmail(query);
+  const { subject } = formatAuthorQueryEmail(query);
 
   // Redacted recipient for safe reporting without disclosing owner email
   const redactedRecipient = authorEmail 

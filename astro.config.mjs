@@ -5,6 +5,15 @@ import node from '@astrojs/node';
 export default defineConfig({
   site: 'https://ag-literary-publication.pages.dev',
   trailingSlash: 'never',
+  server: {
+    host: true,
+    port: 4321
+  },
+  vite: {
+    server: {
+      allowedHosts: true
+    }
+  },
   security: {
     checkOrigin: false
   },

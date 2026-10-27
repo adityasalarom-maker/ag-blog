@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WorkCard from '../../components/WorkCard.astro';
 import { COLLECTIONS, WORKS, type Collection } from '../../data/fixtures';
+import { getBreadcrumbSchema } from '../../lib/seo/schema.ts';
 
 export function getStaticPaths() {
   return COLLECTIONS.map(collection => ({
@@ -16,12 +17,21 @@ interface Props {
 
 const { collection } = Astro.props;
 const worksInCollection = WORKS.filter(w => collection.itemSlugs.includes(w.slug));
+
+const collectionSchemas = [
+  getBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Collections', url: '/collections' },
+    { name: collection.title, url: `/collections/${collection.slug}` }
+  ])
+];
 ---
 
 <BaseLayout 
   title={`${collection.title} — Curated Anthology | Antigravity Review`}
   description={collection.description}
   image={collection.coverImage}
+  schema={collectionSchemas}
 >
   <div class="container collection-page-container">
     <nav class="breadcrumb" aria-label="Breadcrumb navigation">
